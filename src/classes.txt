@@ -1,13 +1,14 @@
 <?php
 
-namespace GenticsMeshRestApi\Raml;
+namespace GenticsMeshRestApi;
 
+use GuzzleHttp\Psr7;
 use GuzzleHttp\Psr7\Request as HttpRequest;
 use GuzzleHttp\Psr7\Uri;
-use GuzzleHttp\Psr7;
 use Psr\Http\Message\RequestInterface;
 
-class Resource {
+class Resource
+{
     const TEMPLATE_REGEXP = '/\{([^\{\}]+)\}/';
 
     /**
@@ -16,15 +17,16 @@ class Resource {
      * @param  mixed $defaults
      * @return string
      */
-    final protected function template($string, array $interpolate = [], array $defaults = []) {
-        return (string)preg_replace_callback(static::TEMPLATE_REGEXP, function ($matches) use ($defaults, $interpolate) {
+    final protected function template($string, array $interpolate = [], array $defaults = [])
+    {
+        return (string) preg_replace_callback(static::TEMPLATE_REGEXP, function ($matches) use ($defaults, $interpolate) {
             $key = $matches[1];
             if (isset($interpolate[$key]) && $interpolate[$key] != null) {
-                return urlencode((string)$interpolate[$key]);
+                return urlencode((string) $interpolate[$key]);
             }
 
             if (isset($defaults[$key]) && $defaults[$key] != null) {
-                return urlencode((string)$defaults[$key]);
+                return urlencode((string) $defaults[$key]);
             }
 
             return '';
@@ -33,42 +35,19 @@ class Resource {
 
     private $uri;
 
-    public function __construct($uri) {
+    public function __construct($uri)
+    {
         $this->uri = $uri;
     }
 
     /**
      * @return string
      */
-    final protected function getUri() {
+    final protected function getUri()
+    {
         return $this->uri;
     }
 
-    /**
-     * @param $method
-     * @param $uri
-     * @param mixed $body
-     * @param array $options
-     * @return RequestInterface
-     */
-    final protected function buildRequest( $method,  $uri, $body = null, array $options = [], $requestClass = 'Request')
-    {
-        $headers = isset($options['headers']) ? $options['headers'] : [];
-        $requestClass = '\\GenticsMeshRestApi\\Raml\\' . $requestClass;
-        /**
-         * @var RequestInterface $request
-         */
-        $request = new $requestClass($method, $uri, $headers, $body);
-
-        if (isset($options['query'])) {
-            ksort($options['query']);
-            $uri = $request->getUri()->withQuery(Psr7\build_query($options['query']));
-            $request = $request->withUri($uri);
-        }
-        
-
-        return $request;
-    }
 }
 
 class Request extends HttpRequest
@@ -90,11 +69,11 @@ class RequestBuilder extends Resource
         }
         parent::__construct(trim($baseUri, '/'));
     }
-    
+
     /**
      * @return RequestInterface
      */
-    final public function buildCustom( $method,  $uri, $body = null, array $options = [])
+    final public function buildCustom($method, $uri, $body = null, array $options = [])
     {
         if (isset($options['uriParameters'])) {
             $uri = $this->template($this->getUri() . $uri, $options['uriParameters']);
@@ -105,333 +84,386 @@ class RequestBuilder extends Resource
         return $this->buildRequest($method, $uri, $body, $options);
     }
 
-
     /**
-     * @return Resource1
+     * @return RawSearchResource
      */
-    public function rawSearch() {
-        return new Resource1($this->getUri() . '/rawSearch');
+    public function rawSearch()
+    {
+        return new RawSearchResource($this->getUri() . '/rawSearch');
     }
 
     /**
-     * @return Resource56
+     * @return UsersResource
      */
-    public function users() {
-        return new Resource56($this->getUri() . '/users');
+    public function users()
+    {
+        return new UsersResource($this->getUri() . '/users');
     }
 
     /**
-     * @return Resource62
+     * @return RolesResource
      */
-    public function roles() {
-        return new Resource62($this->getUri() . '/roles');
+    public function roles()
+    {
+        return new RolesResource($this->getUri() . '/roles');
     }
 
     /**
-     * @return Resource66
+     * @return UtilitiesResource
      */
-    public function utilities() {
-        return new Resource66($this->getUri() . '/utilities');
+    public function utilities()
+    {
+        return new UtilitiesResource($this->getUri() . '/utilities');
     }
 
     /**
-     * @return Resource70
+     * @return GroupsResource
      */
-    public function groups() {
-        return new Resource70($this->getUri() . '/groups');
+    public function groups()
+    {
+        return new GroupsResource($this->getUri() . '/groups');
     }
 
     /**
-     * @return Resource76
+     * @return AuthResource
      */
-    public function auth() {
-        return new Resource76($this->getUri() . '/auth');
+    public function auth()
+    {
+        return new AuthResource($this->getUri() . '/auth');
     }
 
     /**
-     * @return Resource80
+     * @return ProjectsResource
      */
-    public function projects() {
-        return new Resource80($this->getUri() . '/projects');
+    public function projects()
+    {
+        return new ProjectsResource($this->getUri() . '/projects');
     }
 
     /**
      * @return Resource82
      */
-    public function schemas() {
+    public function schemas()
+    {
         return new Resource82($this->getUri() . '/schemas');
     }
 
     /**
-     * @return Resource86
+     * @return MicroschemasResource
      */
-    public function microschemas() {
-        return new Resource86($this->getUri() . '/microschemas');
+    public function microschemas()
+    {
+        return new MicroschemasResource($this->getUri() . '/microschemas');
     }
 
     /**
-     * @return Resource90
+     * @return AdminResource
      */
-    public function admin() {
-        return new Resource90($this->getUri() . '/admin');
+    public function admin()
+    {
+        return new AdminResource($this->getUri() . '/admin');
     }
 
     /**
-     * @return Resource106
+     * @return SearchResource
      */
-    public function search() {
-        return new Resource106($this->getUri() . '/search');
+    public function search()
+    {
+        return new SearchResource($this->getUri() . '/search');
     }
 
     /**
      * @return Resource11
      */
-    public function withProject ($project) {
-      
+    public function withProject($project)
+    {
+
         $uri = $this->template($this->getUri() . '/{project}', ['project' => $project]);
         return new Resource11($uri);
     }
 
 }
-final class Resource1 extends Resource {
+final class RawSearchResource extends Resource
+{
 
     /**
-     * @return Resource2
+     * @return NodeSearchResource
      */
-    public function nodes() {
-        return new Resource2($this->getUri() . '/nodes');
+    public function nodes()
+    {
+        return new NodeSearchResource($this->getUri() . '/nodes');
     }
 
     /**
-     * @return Resource3
+     * @return ProjectSearchResource
      */
-    public function projects() {
-        return new Resource3($this->getUri() . '/projects');
+    public function projects()
+    {
+        return new ProjectSearchResource($this->getUri() . '/projects');
+    }
+
+
+    /**
+     * @return SchemaSearchResource
+     */
+    public function schemas()
+    {
+        return new SchemaSearchResource($this->getUri() . '/schemas');
     }
 
     /**
-     * @return Resource4
+     * @return TagFamiliesSearchResource
      */
-    public function roles() {
-        return new Resource4($this->getUri() . '/roles');
+    public function tagFamilies()
+    {
+        return new TagFamiliesSearchResource($this->getUri() . '/tagFamilies');
     }
 
     /**
-     * @return Resource5
+     * @return TagSearchResource
      */
-    public function schemas() {
-        return new Resource5($this->getUri() . '/schemas');
+    public function tags()
+    {
+        return new TagSearchResource($this->getUri() . '/tags');
     }
 
     /**
-     * @return Resource6
+     * @return UserSearchResource
      */
-    public function tagFamilies() {
-        return new Resource6($this->getUri() . '/tagFamilies');
+    public function users()
+    {
+        return new UserSearchResource($this->getUri() . '/users');
     }
 
     /**
-     * @return Resource7
+     * @return RoleSearchResource
      */
-    public function tags() {
-        return new Resource7($this->getUri() . '/tags');
+    public function roles()
+    {
+        return new RoleSearchResource($this->getUri() . '/roles');
     }
 
     /**
-     * @return Resource8
+     * @return GroupSearchResource
      */
-    public function users() {
-        return new Resource8($this->getUri() . '/users');
+    public function groups()
+    {
+        return new GroupSearchResource($this->getUri() . '/groups');
+    }
+    /**
+     * @return MicroschemaSearchResource
+     */
+    public function microschemas()
+    {
+        return new MicroschemaSearchResource($this->getUri() . '/microschemas');
     }
 
-    /**
-     * @return Resource9
-     */
-    public function microschemas() {
-        return new Resource9($this->getUri() . '/microschemas');
-    }
-
-    /**
-     * @return Resource10
-     */
-    public function groups() {
-        return new Resource10($this->getUri() . '/groups');
-    }
+ 
 }
-final class Resource2 extends Resource {
+final class NodeSearchResource extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource3 extends Resource {
+final class ProjectSearchResource extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource4 extends Resource {
+final class RoleSearchResource extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource5 extends Resource {
+final class SchemaSearchResource extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource6 extends Resource {
+final class TagFamiliesSearchResource extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource7 extends Resource {
+final class TagSearchResource extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource8 extends Resource {
+final class UserSearchResource extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource9 extends Resource {
+final class MicroschemaSearchResource extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource10 extends Resource {
+final class GroupSearchResource extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource11 extends Resource {
+final class Resource11 extends Resource
+{
 
     /**
-     * @return Resource12
+     * @return MicroschemaResource
      */
-    public function microschemas() {
-        return new Resource12($this->getUri() . '/microschemas');
+    public function microschemas()
+    {
+        return new MicroschemaResource($this->getUri() . '/microschemas');
     }
 
     /**
-     * @return Resource14
+     * @return NodesResource
      */
-    public function nodes() {
-        return new Resource14($this->getUri() . '/nodes');
+    public function nodes()
+    {
+        return new NodesResource($this->getUri() . '/nodes');
     }
 
     /**
-     * @return Resource30
+     * @return TagFamiliesResource
      */
-    public function tagFamilies() {
-        return new Resource30($this->getUri() . '/tagFamilies');
+    public function tagFamilies()
+    {
+        return new TagFamiliesResource($this->getUri() . '/tagFamilies');
     }
 
     /**
-     * @return Resource35
+     * @return NavRootResource
      */
-    public function navroot() {
-        return new Resource35($this->getUri() . '/navroot');
+    public function navroot()
+    {
+        return new NavRootResource($this->getUri() . '/navroot');
     }
 
     /**
-     * @return Resource37
+     * @return WebRootResource
      */
-    public function webroot() {
-        return new Resource37($this->getUri() . '/webroot');
+    public function webroot()
+    {
+        return new WebRootResource($this->getUri() . '/webroot');
     }
 
     /**
-     * @return Resource39
+     * @return ReleasesResource
      */
-    public function releases() {
-        return new Resource39($this->getUri() . '/releases');
+    public function releases()
+    {
+        return new ReleasesResource($this->getUri() . '/releases');
     }
 
     /**
-     * @return Resource45
+     * @return GraphQLResource
      */
-    public function graphql() {
-        return new Resource45($this->getUri() . '/graphql');
+    public function graphql()
+    {
+        return new GraphQLResource($this->getUri() . '/graphql');
     }
 
     /**
-     * @return Resource46
+     * @return SearchResource
      */
-    public function search() {
-        return new Resource46($this->getUri() . '/search');
+    public function search()
+    {
+        return new SearchResource($this->getUri() . '/search');
     }
 
     /**
-     * @return Resource50
+     * @return RawSearchResource
      */
-    public function rawSearch() {
-        return new Resource50($this->getUri() . '/rawSearch');
+    public function rawSearch()
+    {
+        return new RawSearchResource($this->getUri() . '/rawSearch');
     }
 
     /**
-     * @return Resource54
+     * @return SchemasResource
      */
-    public function schemas() {
-        return new Resource54($this->getUri() . '/schemas');
+    public function schemas()
+    {
+        return new SchemasResource($this->getUri() . '/schemas');
     }
 }
-final class Resource12 extends Resource {
+final class MicroschemaResource extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -441,18 +473,21 @@ final class Resource12 extends Resource {
     /**
      * @return Resource13
      */
-    public function withMicroschemaUuid ($microschemaUuid) {
-      
+    public function withMicroschemaUuid($microschemaUuid)
+    {
+
         $uri = $this->template($this->getUri() . '/{microschemaUuid}', ['microschemaUuid' => $microschemaUuid]);
         return new Resource13($uri);
     }
 }
-final class Resource13 extends Resource {
+final class Resource13 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function delete ($body = null, array $options = []) {
+    public function delete($body = null, array $options = [])
+    {
 
         return $this->buildRequest('delete', $this->getUri(), $body, $options);
     }
@@ -460,17 +495,20 @@ final class Resource13 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource14 extends Resource {
+final class NodesResource extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
@@ -478,13 +516,13 @@ final class Resource14 extends Resource {
     /**
      * @return Resource14GetRequest
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -494,13 +532,15 @@ final class Resource14 extends Resource {
     /**
      * @return Resource15
      */
-    public function withNodeUuid ($nodeUuid) {
-      
+    public function withNodeUuid($nodeUuid)
+    {
+
         $uri = $this->template($this->getUri() . '/{nodeUuid}', ['nodeUuid' => $nodeUuid]);
         return new Resource15($uri);
     }
 }
-final class Resource14GetRequest extends Request {
+final class Resource14GetRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -508,7 +548,8 @@ final class Resource14GetRequest extends Request {
     /**
      * @return Resource14GetRequest
      */
-    public function withRole($role) {
+    public function withRole($role)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -521,12 +562,12 @@ final class Resource14GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource14GetRequest
      */
-    public function withPerPage($perPage) {
+    public function withPerPage($perPage)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -539,12 +580,12 @@ final class Resource14GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource14GetRequest
      */
-    public function withResolveLinks($resolveLinks) {
+    public function withResolveLinks($resolveLinks)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -557,12 +598,12 @@ final class Resource14GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource14GetRequest
      */
-    public function withRelease($release) {
+    public function withRelease($release)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -575,12 +616,12 @@ final class Resource14GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource14GetRequest
      */
-    public function withPage($page) {
+    public function withPage($page)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -593,12 +634,12 @@ final class Resource14GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource14GetRequest
      */
-    public function withLang($lang) {
+    public function withLang($lang)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -611,12 +652,12 @@ final class Resource14GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource14GetRequest
      */
-    public function withVersion($version) {
+    public function withVersion($version)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -629,76 +670,85 @@ final class Resource14GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource15 extends Resource {
+final class Resource15 extends Resource
+{
 
     /**
      * @return Resource16
      */
-    public function binary() {
+    public function binary()
+    {
         return new Resource16($this->getUri() . '/binary');
     }
 
     /**
      * @return Resource18
      */
-    public function binaryTransform() {
+    public function binaryTransform()
+    {
         return new Resource18($this->getUri() . '/binaryTransform');
     }
 
     /**
      * @return Resource20
      */
-    public function children() {
+    public function children()
+    {
         return new Resource20($this->getUri() . '/children');
     }
 
     /**
      * @return Resource21
      */
-    public function languages() {
+    public function languages()
+    {
         return new Resource21($this->getUri() . '/languages');
     }
 
     /**
      * @return Resource24
      */
-    public function moveTo() {
+    public function moveTo()
+    {
         return new Resource24($this->getUri() . '/moveTo');
     }
 
     /**
      * @return Resource26
      */
-    public function navigation() {
+    public function navigation()
+    {
         return new Resource26($this->getUri() . '/navigation');
     }
 
     /**
      * @return Resource27
      */
-    public function published() {
+    public function published()
+    {
         return new Resource27($this->getUri() . '/published');
     }
 
     /**
      * @return Resource28
      */
-    public function tags() {
+    public function tags()
+    {
         return new Resource28($this->getUri() . '/tags');
     }
 
     /**
      * @return Resource15GetRequest
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -708,7 +758,8 @@ final class Resource15 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
@@ -716,12 +767,14 @@ final class Resource15 extends Resource {
     /**
      * @return Resource15DeleteRequest
      */
-    public function delete ($body = null, array $options = []) {
+    public function delete($body = null, array $options = [])
+    {
 
         return $this->buildRequest('delete', $this->getUri(), $body, $options, 'Resource15DeleteRequest');
     }
 }
-final class Resource15GetRequest extends Request {
+final class Resource15GetRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -729,7 +782,8 @@ final class Resource15GetRequest extends Request {
     /**
      * @return Resource15GetRequest
      */
-    public function withRole($role) {
+    public function withRole($role)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -742,12 +796,12 @@ final class Resource15GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource15GetRequest
      */
-    public function withLang($lang) {
+    public function withLang($lang)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -760,12 +814,12 @@ final class Resource15GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource15GetRequest
      */
-    public function withVersion($version) {
+    public function withVersion($version)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -778,12 +832,12 @@ final class Resource15GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource15GetRequest
      */
-    public function withResolveLinks($resolveLinks) {
+    public function withResolveLinks($resolveLinks)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -796,12 +850,12 @@ final class Resource15GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource15GetRequest
      */
-    public function withRelease($release) {
+    public function withRelease($release)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -814,9 +868,10 @@ final class Resource15GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource15DeleteRequest extends Request {
+final class Resource15DeleteRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -824,7 +879,8 @@ final class Resource15DeleteRequest extends Request {
     /**
      * @return Resource15DeleteRequest
      */
-    public function withRecursive($recursive) {
+    public function withRecursive($recursive)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -837,25 +893,29 @@ final class Resource15DeleteRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource16 extends Resource {
+final class Resource16 extends Resource
+{
 
     /**
      * @return Resource17
      */
-    public function withFieldName ($fieldName) {
-      
+    public function withFieldName($fieldName)
+    {
+
         $uri = $this->template($this->getUri() . '/{fieldName}', ['fieldName' => $fieldName]);
         return new Resource17($uri);
     }
 }
-final class Resource17 extends Resource {
+final class Resource17 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
@@ -863,20 +923,21 @@ final class Resource17 extends Resource {
     /**
      * @return Resource17GetRequest
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
         return $this->buildRequest('get', $this->getUri(), null, $options, 'Resource17GetRequest');
     }
 }
-final class Resource17GetRequest extends Request {
+final class Resource17GetRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -884,7 +945,8 @@ final class Resource17GetRequest extends Request {
     /**
      * @return Resource17GetRequest
      */
-    public function withFpz($fpz) {
+    public function withFpz($fpz)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -897,12 +959,12 @@ final class Resource17GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource17GetRequest
      */
-    public function withRect($rect) {
+    public function withRect($rect)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -915,12 +977,12 @@ final class Resource17GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource17GetRequest
      */
-    public function withRelease($release) {
+    public function withRelease($release)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -933,12 +995,12 @@ final class Resource17GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource17GetRequest
      */
-    public function withW($w) {
+    public function withW($w)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -951,12 +1013,12 @@ final class Resource17GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource17GetRequest
      */
-    public function withH($h) {
+    public function withH($h)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -969,12 +1031,12 @@ final class Resource17GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource17GetRequest
      */
-    public function withVersion($version) {
+    public function withVersion($version)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -987,12 +1049,12 @@ final class Resource17GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource17GetRequest
      */
-    public function withFpy($fpy) {
+    public function withFpy($fpy)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -1005,12 +1067,12 @@ final class Resource17GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource17GetRequest
      */
-    public function withCrop($crop) {
+    public function withCrop($crop)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -1023,12 +1085,12 @@ final class Resource17GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource17GetRequest
      */
-    public function withFpx($fpx) {
+    public function withFpx($fpx)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -1041,48 +1103,54 @@ final class Resource17GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource18 extends Resource {
+final class Resource18 extends Resource
+{
 
     /**
      * @return Resource19
      */
-    public function withFieldName ($fieldName) {
-      
+    public function withFieldName($fieldName)
+    {
+
         $uri = $this->template($this->getUri() . '/{fieldName}', ['fieldName' => $fieldName]);
         return new Resource19($uri);
     }
 }
-final class Resource19 extends Resource {
+final class Resource19 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource20 extends Resource {
+final class Resource20 extends Resource
+{
 
     /**
      * @return Resource20GetRequest
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
         return $this->buildRequest('get', $this->getUri(), null, $options, 'Resource20GetRequest');
     }
 }
-final class Resource20GetRequest extends Request {
+final class Resource20GetRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -1090,7 +1158,8 @@ final class Resource20GetRequest extends Request {
     /**
      * @return Resource20GetRequest
      */
-    public function withPerPage($perPage) {
+    public function withPerPage($perPage)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -1103,12 +1172,12 @@ final class Resource20GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource20GetRequest
      */
-    public function withPage($page) {
+    public function withPage($page)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -1121,12 +1190,12 @@ final class Resource20GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource20GetRequest
      */
-    public function withLang($lang) {
+    public function withLang($lang)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -1139,12 +1208,12 @@ final class Resource20GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource20GetRequest
      */
-    public function withResolveLinks($resolveLinks) {
+    public function withResolveLinks($resolveLinks)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -1157,12 +1226,12 @@ final class Resource20GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource20GetRequest
      */
-    public function withVersion($version) {
+    public function withVersion($version)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -1175,12 +1244,12 @@ final class Resource20GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource20GetRequest
      */
-    public function withRelease($release) {
+    public function withRelease($release)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -1193,48 +1262,54 @@ final class Resource20GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource21 extends Resource {
+final class Resource21 extends Resource
+{
 
     /**
      * @return Resource22
      */
-    public function withLanguage ($language) {
-      
+    public function withLanguage($language)
+    {
+
         $uri = $this->template($this->getUri() . '/{language}', ['language' => $language]);
         return new Resource22($uri);
     }
 }
-final class Resource22 extends Resource {
+final class Resource22 extends Resource
+{
 
     /**
      * @return Resource23
      */
-    public function published() {
+    public function published()
+    {
         return new Resource23($this->getUri() . '/published');
     }
 
     /**
      * @return RequestInterface
      */
-    public function delete ($body = null, array $options = []) {
+    public function delete($body = null, array $options = [])
+    {
 
         return $this->buildRequest('delete', $this->getUri(), $body, $options);
     }
 }
-final class Resource23 extends Resource {
+final class Resource23 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -1244,7 +1319,8 @@ final class Resource23 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
@@ -1252,33 +1328,39 @@ final class Resource23 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function delete ($body = null, array $options = []) {
+    public function delete($body = null, array $options = [])
+    {
 
         return $this->buildRequest('delete', $this->getUri(), $body, $options);
     }
 }
-final class Resource24 extends Resource {
+final class Resource24 extends Resource
+{
 
     /**
      * @return Resource25
      */
-    public function withToUuid ($toUuid) {
-      
+    public function withToUuid($toUuid)
+    {
+
         $uri = $this->template($this->getUri() . '/{toUuid}', ['toUuid' => $toUuid]);
         return new Resource25($uri);
     }
 }
-final class Resource25 extends Resource {
+final class Resource25 extends Resource
+{
 
     /**
      * @return Resource25PostRequest
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options, 'Resource25PostRequest');
     }
 }
-final class Resource25PostRequest extends Request {
+final class Resource25PostRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -1286,7 +1368,8 @@ final class Resource25PostRequest extends Request {
     /**
      * @return Resource25PostRequest
      */
-    public function withVersion($version) {
+    public function withVersion($version)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -1299,12 +1382,12 @@ final class Resource25PostRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource25PostRequest
      */
-    public function withRelease($release) {
+    public function withRelease($release)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -1317,27 +1400,29 @@ final class Resource25PostRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource26 extends Resource {
+final class Resource26 extends Resource
+{
 
     /**
      * @return Resource26GetRequest
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
         return $this->buildRequest('get', $this->getUri(), null, $options, 'Resource26GetRequest');
     }
 }
-final class Resource26GetRequest extends Request {
+final class Resource26GetRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -1345,7 +1430,8 @@ final class Resource26GetRequest extends Request {
     /**
      * @return Resource26GetRequest
      */
-    public function withMaxDepth($maxDepth) {
+    public function withMaxDepth($maxDepth)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -1358,12 +1444,12 @@ final class Resource26GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource26GetRequest
      */
-    public function withIncludeAll($includeAll) {
+    public function withIncludeAll($includeAll)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -1376,20 +1462,21 @@ final class Resource26GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource27 extends Resource {
+final class Resource27 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -1399,7 +1486,8 @@ final class Resource27 extends Resource {
     /**
      * @return Resource27PostRequest
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options, 'Resource27PostRequest');
     }
@@ -1407,12 +1495,14 @@ final class Resource27 extends Resource {
     /**
      * @return Resource27DeleteRequest
      */
-    public function delete ($body = null, array $options = []) {
+    public function delete($body = null, array $options = [])
+    {
 
         return $this->buildRequest('delete', $this->getUri(), $body, $options, 'Resource27DeleteRequest');
     }
 }
-final class Resource27PostRequest extends Request {
+final class Resource27PostRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -1420,7 +1510,8 @@ final class Resource27PostRequest extends Request {
     /**
      * @return Resource27PostRequest
      */
-    public function withRecursive($recursive) {
+    public function withRecursive($recursive)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -1433,9 +1524,10 @@ final class Resource27PostRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource27DeleteRequest extends Request {
+final class Resource27DeleteRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -1443,7 +1535,8 @@ final class Resource27DeleteRequest extends Request {
     /**
      * @return Resource27DeleteRequest
      */
-    public function withRecursive($recursive) {
+    public function withRecursive($recursive)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -1456,20 +1549,21 @@ final class Resource27DeleteRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource28 extends Resource {
+final class Resource28 extends Resource
+{
 
     /**
      * @return Resource28GetRequest
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -1479,7 +1573,8 @@ final class Resource28 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
@@ -1487,13 +1582,15 @@ final class Resource28 extends Resource {
     /**
      * @return Resource29
      */
-    public function withTagUuid ($tagUuid) {
-      
+    public function withTagUuid($tagUuid)
+    {
+
         $uri = $this->template($this->getUri() . '/{tagUuid}', ['tagUuid' => $tagUuid]);
         return new Resource29($uri);
     }
 }
-final class Resource28GetRequest extends Request {
+final class Resource28GetRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -1501,7 +1598,8 @@ final class Resource28GetRequest extends Request {
     /**
      * @return Resource28GetRequest
      */
-    public function withVersion($version) {
+    public function withVersion($version)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -1514,12 +1612,12 @@ final class Resource28GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource28GetRequest
      */
-    public function withRelease($release) {
+    public function withRelease($release)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -1532,14 +1630,16 @@ final class Resource28GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource29 extends Resource {
+final class Resource29 extends Resource
+{
 
     /**
      * @return Resource29PostRequest
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options, 'Resource29PostRequest');
     }
@@ -1547,12 +1647,14 @@ final class Resource29 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function delete ($body = null, array $options = []) {
+    public function delete($body = null, array $options = [])
+    {
 
         return $this->buildRequest('delete', $this->getUri(), $body, $options);
     }
 }
-final class Resource29PostRequest extends Request {
+final class Resource29PostRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -1560,7 +1662,8 @@ final class Resource29PostRequest extends Request {
     /**
      * @return Resource29PostRequest
      */
-    public function withVersion($version) {
+    public function withVersion($version)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -1573,12 +1676,12 @@ final class Resource29PostRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource29PostRequest
      */
-    public function withRelease($release) {
+    public function withRelease($release)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -1591,20 +1694,21 @@ final class Resource29PostRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource30 extends Resource {
+final class TagFamiliesResource extends Resource
+{
 
     /**
      * @return Resource30GetRequest
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -1614,7 +1718,8 @@ final class Resource30 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
@@ -1622,13 +1727,15 @@ final class Resource30 extends Resource {
     /**
      * @return Resource31
      */
-    public function withTagFamilyUuid ($tagFamilyUuid) {
-      
+    public function withTagFamilyUuid($tagFamilyUuid)
+    {
+
         $uri = $this->template($this->getUri() . '/{tagFamilyUuid}', ['tagFamilyUuid' => $tagFamilyUuid]);
         return new Resource31($uri);
     }
 }
-final class Resource30GetRequest extends Request {
+final class Resource30GetRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -1636,7 +1743,8 @@ final class Resource30GetRequest extends Request {
     /**
      * @return Resource30GetRequest
      */
-    public function withPerPage($perPage) {
+    public function withPerPage($perPage)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -1649,12 +1757,12 @@ final class Resource30GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource30GetRequest
      */
-    public function withPage($page) {
+    public function withPage($page)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -1667,27 +1775,29 @@ final class Resource30GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource31 extends Resource {
+final class Resource31 extends Resource
+{
 
     /**
      * @return Resource32
      */
-    public function tags() {
+    public function tags()
+    {
         return new Resource32($this->getUri() . '/tags');
     }
 
     /**
      * @return RequestInterface
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -1697,7 +1807,8 @@ final class Resource31 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
@@ -1705,17 +1816,20 @@ final class Resource31 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function delete ($body = null, array $options = []) {
+    public function delete($body = null, array $options = [])
+    {
 
         return $this->buildRequest('delete', $this->getUri(), $body, $options);
     }
 }
-final class Resource32 extends Resource {
+final class Resource32 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
@@ -1723,13 +1837,13 @@ final class Resource32 extends Resource {
     /**
      * @return Resource32GetRequest
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -1739,13 +1853,15 @@ final class Resource32 extends Resource {
     /**
      * @return Resource33
      */
-    public function withTagUuid ($tagUuid) {
-      
+    public function withTagUuid($tagUuid)
+    {
+
         $uri = $this->template($this->getUri() . '/{tagUuid}', ['tagUuid' => $tagUuid]);
         return new Resource33($uri);
     }
 }
-final class Resource32GetRequest extends Request {
+final class Resource32GetRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -1753,7 +1869,8 @@ final class Resource32GetRequest extends Request {
     /**
      * @return Resource32GetRequest
      */
-    public function withPerPage($perPage) {
+    public function withPerPage($perPage)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -1766,12 +1883,12 @@ final class Resource32GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource32GetRequest
      */
-    public function withPage($page) {
+    public function withPage($page)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -1784,27 +1901,29 @@ final class Resource32GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource33 extends Resource {
+final class Resource33 extends Resource
+{
 
     /**
      * @return Resource34
      */
-    public function nodes() {
+    public function nodes()
+    {
         return new Resource34($this->getUri() . '/nodes');
     }
 
     /**
      * @return RequestInterface
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -1814,7 +1933,8 @@ final class Resource33 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
@@ -1822,30 +1942,33 @@ final class Resource33 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function delete ($body = null, array $options = []) {
+    public function delete($body = null, array $options = [])
+    {
 
         return $this->buildRequest('delete', $this->getUri(), $body, $options);
     }
 }
-final class Resource34 extends Resource {
+final class Resource34 extends Resource
+{
 
     /**
      * @return Resource34GetRequest
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
         return $this->buildRequest('get', $this->getUri(), null, $options, 'Resource34GetRequest');
     }
 }
-final class Resource34GetRequest extends Request {
+final class Resource34GetRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -1853,7 +1976,8 @@ final class Resource34GetRequest extends Request {
     /**
      * @return Resource34GetRequest
      */
-    public function withPerPage($perPage) {
+    public function withPerPage($perPage)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -1866,12 +1990,12 @@ final class Resource34GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource34GetRequest
      */
-    public function withPage($page) {
+    public function withPage($page)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -1884,38 +2008,42 @@ final class Resource34GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource35 extends Resource {
+final class NavRootResource extends Resource
+{
 
     /**
      * @return Resource36
      */
-    public function withPath ($path) {
-      
+    public function withPath($path)
+    {
+
         $uri = $this->template($this->getUri() . '/{path}', ['path' => $path]);
         return new Resource36($uri);
     }
 }
-final class Resource36 extends Resource {
+final class Resource36 extends Resource
+{
 
     /**
      * @return Resource36GetRequest
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
         return $this->buildRequest('get', $this->getUri(), null, $options, 'Resource36GetRequest');
     }
 }
-final class Resource36GetRequest extends Request {
+final class Resource36GetRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -1923,7 +2051,8 @@ final class Resource36GetRequest extends Request {
     /**
      * @return Resource36GetRequest
      */
-    public function withMaxDepth($maxDepth) {
+    public function withMaxDepth($maxDepth)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -1936,12 +2065,12 @@ final class Resource36GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource36GetRequest
      */
-    public function withIncludeAll($includeAll) {
+    public function withIncludeAll($includeAll)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -1954,38 +2083,42 @@ final class Resource36GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource37 extends Resource {
+final class WebRootResource extends Resource
+{
 
     /**
      * @return Resource38
      */
-    public function withPath ($path) {
-      
+    public function withPath($path)
+    {
+
         $uri = $this->template($this->getUri() . '/{path}', ['path' => $path]);
         return new Resource38($uri);
     }
 }
-final class Resource38 extends Resource {
+final class Resource38 extends Resource
+{
 
     /**
      * @return Resource38GetRequest
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
         return $this->buildRequest('get', $this->getUri(), null, $options, 'Resource38GetRequest');
     }
 }
-final class Resource38GetRequest extends Request {
+final class Resource38GetRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -1993,7 +2126,8 @@ final class Resource38GetRequest extends Request {
     /**
      * @return Resource38GetRequest
      */
-    public function withFpz($fpz) {
+    public function withFpz($fpz)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -2006,12 +2140,12 @@ final class Resource38GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource38GetRequest
      */
-    public function withRect($rect) {
+    public function withRect($rect)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -2024,12 +2158,12 @@ final class Resource38GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource38GetRequest
      */
-    public function withW($w) {
+    public function withW($w)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -2042,12 +2176,12 @@ final class Resource38GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource38GetRequest
      */
-    public function withH($h) {
+    public function withH($h)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -2060,12 +2194,12 @@ final class Resource38GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource38GetRequest
      */
-    public function withFpy($fpy) {
+    public function withFpy($fpy)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -2078,12 +2212,12 @@ final class Resource38GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource38GetRequest
      */
-    public function withCrop($crop) {
+    public function withCrop($crop)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -2096,12 +2230,12 @@ final class Resource38GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource38GetRequest
      */
-    public function withFpx($fpx) {
+    public function withFpx($fpx)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -2114,14 +2248,16 @@ final class Resource38GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource39 extends Resource {
+final class ReleasesResource extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
@@ -2129,13 +2265,13 @@ final class Resource39 extends Resource {
     /**
      * @return Resource39GetRequest
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -2145,13 +2281,15 @@ final class Resource39 extends Resource {
     /**
      * @return Resource40
      */
-    public function withReleaseUuid ($releaseUuid) {
-      
+    public function withReleaseUuid($releaseUuid)
+    {
+
         $uri = $this->template($this->getUri() . '/{releaseUuid}', ['releaseUuid' => $releaseUuid]);
         return new Resource40($uri);
     }
 }
-final class Resource39GetRequest extends Request {
+final class Resource39GetRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -2159,7 +2297,8 @@ final class Resource39GetRequest extends Request {
     /**
      * @return Resource39GetRequest
      */
-    public function withPerPage($perPage) {
+    public function withPerPage($perPage)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -2172,12 +2311,12 @@ final class Resource39GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource39GetRequest
      */
-    public function withPage($page) {
+    public function withPage($page)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -2190,48 +2329,53 @@ final class Resource39GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource40 extends Resource {
+final class Resource40 extends Resource
+{
 
     /**
      * @return Resource41
      */
-    public function microschemas() {
+    public function microschemas()
+    {
         return new Resource41($this->getUri() . '/microschemas');
     }
 
     /**
      * @return Resource42
      */
-    public function migrateMicroschemas() {
+    public function migrateMicroschemas()
+    {
         return new Resource42($this->getUri() . '/migrateMicroschemas');
     }
 
     /**
      * @return Resource43
      */
-    public function migrateSchemas() {
+    public function migrateSchemas()
+    {
         return new Resource43($this->getUri() . '/migrateSchemas');
     }
 
     /**
      * @return Resource44
      */
-    public function schemas() {
+    public function schemas()
+    {
         return new Resource44($this->getUri() . '/schemas');
     }
 
     /**
      * @return RequestInterface
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -2241,23 +2385,25 @@ final class Resource40 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource41 extends Resource {
+final class Resource41 extends Resource
+{
 
     /**
      * @return Resource41GetRequest
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -2267,12 +2413,14 @@ final class Resource41 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource41GetRequest extends Request {
+final class Resource41GetRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -2280,7 +2428,8 @@ final class Resource41GetRequest extends Request {
     /**
      * @return Resource41GetRequest
      */
-    public function withPerPage($perPage) {
+    public function withPerPage($perPage)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -2293,12 +2442,12 @@ final class Resource41GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource41GetRequest
      */
-    public function withPage($page) {
+    public function withPage($page)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -2311,40 +2460,45 @@ final class Resource41GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource42 extends Resource {
+final class Resource42 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource43 extends Resource {
+final class Resource43 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource44 extends Resource {
+final class Resource44 extends Resource
+{
 
     /**
      * @return Resource44GetRequest
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -2354,12 +2508,14 @@ final class Resource44 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource44GetRequest extends Request {
+final class Resource44GetRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -2367,7 +2523,8 @@ final class Resource44GetRequest extends Request {
     /**
      * @return Resource44GetRequest
      */
-    public function withPerPage($perPage) {
+    public function withPerPage($perPage)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -2380,12 +2537,12 @@ final class Resource44GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource44GetRequest
      */
-    public function withPage($page) {
+    public function withPage($page)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -2398,136 +2555,165 @@ final class Resource44GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource45 extends Resource {
+final class GraphQLResource extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource46 extends Resource {
+
+final class SearchResource extends Resource
+{
 
     /**
      * @return Resource47
      */
-    public function nodes() {
+    public function nodes()
+    {
         return new Resource47($this->getUri() . '/nodes');
     }
 
     /**
      * @return Resource48
      */
-    public function tagFamilies() {
+    public function tagFamilies()
+    {
         return new Resource48($this->getUri() . '/tagFamilies');
     }
 
     /**
      * @return Resource49
      */
-    public function tags() {
+    public function tags()
+    {
         return new Resource49($this->getUri() . '/tags');
     }
 }
-final class Resource47 extends Resource {
+
+final class Resource47 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource48 extends Resource {
+
+final class Resource48 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource49 extends Resource {
+
+final class Resource49 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource50 extends Resource {
+
+final class RawSearchResource extends Resource
+{
 
     /**
      * @return Resource51
      */
-    public function nodes() {
+    public function nodes()
+    {
         return new Resource51($this->getUri() . '/nodes');
     }
 
     /**
      * @return Resource52
      */
-    public function tagFamilies() {
+    public function tagFamilies()
+    {
         return new Resource52($this->getUri() . '/tagFamilies');
     }
 
     /**
      * @return Resource53
      */
-    public function tags() {
+    public function tags()
+    {
         return new Resource53($this->getUri() . '/tags');
     }
 }
-final class Resource51 extends Resource {
+
+final class Resource51 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource52 extends Resource {
+final class Resource52 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource53 extends Resource {
+final class Resource53 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource54 extends Resource {
+final class SchemasResource extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -2537,24 +2723,26 @@ final class Resource54 extends Resource {
     /**
      * @return Resource55
      */
-    public function withSchemaUuid ($schemaUuid) {
-      
+    public function withSchemaUuid($schemaUuid)
+    {
+
         $uri = $this->template($this->getUri() . '/{schemaUuid}', ['schemaUuid' => $schemaUuid]);
         return new Resource55($uri);
     }
 }
-final class Resource55 extends Resource {
+final class Resource55 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -2564,7 +2752,8 @@ final class Resource55 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function delete ($body = null, array $options = []) {
+    public function delete($body = null, array $options = [])
+    {
 
         return $this->buildRequest('delete', $this->getUri(), $body, $options);
     }
@@ -2572,17 +2761,20 @@ final class Resource55 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource56 extends Resource {
+final class UsersResource extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
@@ -2590,13 +2782,13 @@ final class Resource56 extends Resource {
     /**
      * @return Resource56GetRequest
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -2606,13 +2798,15 @@ final class Resource56 extends Resource {
     /**
      * @return Resource57
      */
-    public function withUserUuid ($userUuid) {
-      
+    public function withUserUuid($userUuid)
+    {
+
         $uri = $this->template($this->getUri() . '/{userUuid}', ['userUuid' => $userUuid]);
         return new Resource57($uri);
     }
 }
-final class Resource56GetRequest extends Request {
+final class Resource56GetRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -2620,7 +2814,8 @@ final class Resource56GetRequest extends Request {
     /**
      * @return Resource56GetRequest
      */
-    public function withRole($role) {
+    public function withRole($role)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -2633,12 +2828,12 @@ final class Resource56GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource56GetRequest
      */
-    public function withPerPage($perPage) {
+    public function withPerPage($perPage)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -2651,12 +2846,12 @@ final class Resource56GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource56GetRequest
      */
-    public function withResolveLinks($resolveLinks) {
+    public function withResolveLinks($resolveLinks)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -2669,12 +2864,12 @@ final class Resource56GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource56GetRequest
      */
-    public function withRelease($release) {
+    public function withRelease($release)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -2687,12 +2882,12 @@ final class Resource56GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource56GetRequest
      */
-    public function withPage($page) {
+    public function withPage($page)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -2705,12 +2900,12 @@ final class Resource56GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource56GetRequest
      */
-    public function withLang($lang) {
+    public function withLang($lang)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -2723,12 +2918,12 @@ final class Resource56GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource56GetRequest
      */
-    public function withVersion($version) {
+    public function withVersion($version)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -2741,35 +2936,40 @@ final class Resource56GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource57 extends Resource {
+final class Resource57 extends Resource
+{
 
     /**
      * @return Resource58
      */
-    public function resetToken() {
+    public function resetToken()
+    {
         return new Resource58($this->getUri() . '/reset_token');
     }
 
     /**
      * @return Resource59
      */
-    public function token() {
+    public function token()
+    {
         return new Resource59($this->getUri() . '/token');
     }
 
     /**
      * @return Resource60
      */
-    public function permissions() {
+    public function permissions()
+    {
         return new Resource60($this->getUri() . '/permissions');
     }
 
     /**
      * @return Resource57PostRequest
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options, 'Resource57PostRequest');
     }
@@ -2777,7 +2977,8 @@ final class Resource57 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function delete ($body = null, array $options = []) {
+    public function delete($body = null, array $options = [])
+    {
 
         return $this->buildRequest('delete', $this->getUri(), $body, $options);
     }
@@ -2785,20 +2986,21 @@ final class Resource57 extends Resource {
     /**
      * @return Resource57GetRequest
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
         return $this->buildRequest('get', $this->getUri(), null, $options, 'Resource57GetRequest');
     }
 }
-final class Resource57PostRequest extends Request {
+final class Resource57PostRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -2806,7 +3008,8 @@ final class Resource57PostRequest extends Request {
     /**
      * @return Resource57PostRequest
      */
-    public function withToken($token) {
+    public function withToken($token)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -2819,9 +3022,10 @@ final class Resource57PostRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource57GetRequest extends Request {
+final class Resource57GetRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -2829,7 +3033,8 @@ final class Resource57GetRequest extends Request {
     /**
      * @return Resource57GetRequest
      */
-    public function withRole($role) {
+    public function withRole($role)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -2842,12 +3047,12 @@ final class Resource57GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource57GetRequest
      */
-    public function withLang($lang) {
+    public function withLang($lang)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -2860,12 +3065,12 @@ final class Resource57GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource57GetRequest
      */
-    public function withResolveLinks($resolveLinks) {
+    public function withResolveLinks($resolveLinks)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -2878,12 +3083,12 @@ final class Resource57GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource57GetRequest
      */
-    public function withVersion($version) {
+    public function withVersion($version)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -2896,12 +3101,12 @@ final class Resource57GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource57GetRequest
      */
-    public function withRelease($release) {
+    public function withRelease($release)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -2914,24 +3119,28 @@ final class Resource57GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource58 extends Resource {
+final class Resource58 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource59 extends Resource {
+final class Resource59 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function delete ($body = null, array $options = []) {
+    public function delete($body = null, array $options = [])
+    {
 
         return $this->buildRequest('delete', $this->getUri(), $body, $options);
     }
@@ -2939,52 +3148,57 @@ final class Resource59 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource60 extends Resource {
+final class Resource60 extends Resource
+{
 
     /**
      * @return Resource61
      */
-    public function withPath ($path) {
-      
+    public function withPath($path)
+    {
+
         $uri = $this->template($this->getUri() . '/{path}', ['path' => $path]);
         return new Resource61($uri);
     }
 }
-final class Resource61 extends Resource {
+final class Resource61 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
         return $this->buildRequest('get', $this->getUri(), null, $options);
     }
 }
-final class Resource62 extends Resource {
+final class RolesResource extends Resource
+{
 
     /**
      * @return Resource62GetRequest
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -2994,7 +3208,8 @@ final class Resource62 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
@@ -3002,13 +3217,15 @@ final class Resource62 extends Resource {
     /**
      * @return Resource63
      */
-    public function withRoleUuid ($roleUuid) {
-      
+    public function withRoleUuid($roleUuid)
+    {
+
         $uri = $this->template($this->getUri() . '/{roleUuid}', ['roleUuid' => $roleUuid]);
         return new Resource63($uri);
     }
 }
-final class Resource62GetRequest extends Request {
+final class Resource62GetRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -3016,7 +3233,8 @@ final class Resource62GetRequest extends Request {
     /**
      * @return Resource62GetRequest
      */
-    public function withPerPage($perPage) {
+    public function withPerPage($perPage)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -3029,12 +3247,12 @@ final class Resource62GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource62GetRequest
      */
-    public function withPage($page) {
+    public function withPage($page)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -3047,21 +3265,24 @@ final class Resource62GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource63 extends Resource {
+final class Resource63 extends Resource
+{
 
     /**
      * @return Resource64
      */
-    public function permissions() {
+    public function permissions()
+    {
         return new Resource64($this->getUri() . '/permissions');
     }
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
@@ -3069,13 +3290,13 @@ final class Resource63 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -3085,28 +3306,33 @@ final class Resource63 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function delete ($body = null, array $options = []) {
+    public function delete($body = null, array $options = [])
+    {
 
         return $this->buildRequest('delete', $this->getUri(), $body, $options);
     }
 }
-final class Resource64 extends Resource {
+final class Resource64 extends Resource
+{
 
     /**
      * @return Resource65
      */
-    public function withPath ($path) {
-      
+    public function withPath($path)
+    {
+
         $uri = $this->template($this->getUri() . '/{path}', ['path' => $path]);
         return new Resource65($uri);
     }
 }
-final class Resource65 extends Resource {
+final class Resource65 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
@@ -3114,53 +3340,60 @@ final class Resource65 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
         return $this->buildRequest('get', $this->getUri(), null, $options);
     }
 }
-final class Resource66 extends Resource {
+final class UtilitiesResource extends Resource
+{
 
     /**
      * @return Resource67
      */
-    public function linkResolver() {
+    public function linkResolver()
+    {
         return new Resource67($this->getUri() . '/linkResolver');
     }
 
     /**
      * @return Resource68
      */
-    public function validateMicroschema() {
+    public function validateMicroschema()
+    {
         return new Resource68($this->getUri() . '/validateMicroschema');
     }
 
     /**
      * @return Resource69
      */
-    public function validateSchema() {
+    public function validateSchema()
+    {
         return new Resource69($this->getUri() . '/validateSchema');
     }
 }
-final class Resource67 extends Resource {
+final class Resource67 extends Resource
+{
 
     /**
      * @return Resource67PostRequest
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options, 'Resource67PostRequest');
     }
 }
-final class Resource67PostRequest extends Request {
+final class Resource67PostRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -3168,7 +3401,8 @@ final class Resource67PostRequest extends Request {
     /**
      * @return Resource67PostRequest
      */
-    public function withLang($lang) {
+    public function withLang($lang)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -3181,12 +3415,12 @@ final class Resource67PostRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource67PostRequest
      */
-    public function withResolveLinks($resolveLinks) {
+    public function withResolveLinks($resolveLinks)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -3199,34 +3433,40 @@ final class Resource67PostRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource68 extends Resource {
+final class Resource68 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource69 extends Resource {
+final class Resource69 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource70 extends Resource {
+final class GroupsResource extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
@@ -3234,13 +3474,13 @@ final class Resource70 extends Resource {
     /**
      * @return Resource70GetRequest
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -3250,13 +3490,15 @@ final class Resource70 extends Resource {
     /**
      * @return Resource71
      */
-    public function withGroupUuid ($groupUuid) {
-      
+    public function withGroupUuid($groupUuid)
+    {
+
         $uri = $this->template($this->getUri() . '/{groupUuid}', ['groupUuid' => $groupUuid]);
         return new Resource71($uri);
     }
 }
-final class Resource70GetRequest extends Request {
+final class Resource70GetRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -3264,7 +3506,8 @@ final class Resource70GetRequest extends Request {
     /**
      * @return Resource70GetRequest
      */
-    public function withPerPage($perPage) {
+    public function withPerPage($perPage)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -3277,12 +3520,12 @@ final class Resource70GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource70GetRequest
      */
-    public function withPage($page) {
+    public function withPage($page)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -3295,12 +3538,12 @@ final class Resource70GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource70GetRequest
      */
-    public function withRole($role) {
+    public function withRole($role)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -3313,34 +3556,37 @@ final class Resource70GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource71 extends Resource {
+final class Resource71 extends Resource
+{
 
     /**
      * @return Resource72
      */
-    public function roles() {
+    public function roles()
+    {
         return new Resource72($this->getUri() . '/roles');
     }
 
     /**
      * @return Resource74
      */
-    public function users() {
+    public function users()
+    {
         return new Resource74($this->getUri() . '/users');
     }
 
     /**
      * @return Resource71GetRequest
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -3350,7 +3596,8 @@ final class Resource71 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function delete ($body = null, array $options = []) {
+    public function delete($body = null, array $options = [])
+    {
 
         return $this->buildRequest('delete', $this->getUri(), $body, $options);
     }
@@ -3358,12 +3605,14 @@ final class Resource71 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource71GetRequest extends Request {
+final class Resource71GetRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -3371,7 +3620,8 @@ final class Resource71GetRequest extends Request {
     /**
      * @return Resource71GetRequest
      */
-    public function withRole($role) {
+    public function withRole($role)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -3384,20 +3634,21 @@ final class Resource71GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource72 extends Resource {
+final class Resource72 extends Resource
+{
 
     /**
      * @return Resource72GetRequest
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -3407,13 +3658,15 @@ final class Resource72 extends Resource {
     /**
      * @return Resource73
      */
-    public function withRoleUuid ($roleUuid) {
-      
+    public function withRoleUuid($roleUuid)
+    {
+
         $uri = $this->template($this->getUri() . '/{roleUuid}', ['roleUuid' => $roleUuid]);
         return new Resource73($uri);
     }
 }
-final class Resource72GetRequest extends Request {
+final class Resource72GetRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -3421,7 +3674,8 @@ final class Resource72GetRequest extends Request {
     /**
      * @return Resource72GetRequest
      */
-    public function withPerPage($perPage) {
+    public function withPerPage($perPage)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -3434,12 +3688,12 @@ final class Resource72GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource72GetRequest
      */
-    public function withPage($page) {
+    public function withPage($page)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -3452,12 +3706,12 @@ final class Resource72GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource72GetRequest
      */
-    public function withRole($role) {
+    public function withRole($role)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -3470,14 +3724,16 @@ final class Resource72GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource73 extends Resource {
+final class Resource73 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
@@ -3485,23 +3741,25 @@ final class Resource73 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function delete ($body = null, array $options = []) {
+    public function delete($body = null, array $options = [])
+    {
 
         return $this->buildRequest('delete', $this->getUri(), $body, $options);
     }
 }
-final class Resource74 extends Resource {
+final class Resource74 extends Resource
+{
 
     /**
      * @return Resource74GetRequest
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -3511,13 +3769,15 @@ final class Resource74 extends Resource {
     /**
      * @return Resource75
      */
-    public function withUserUuid ($userUuid) {
-      
+    public function withUserUuid($userUuid)
+    {
+
         $uri = $this->template($this->getUri() . '/{userUuid}', ['userUuid' => $userUuid]);
         return new Resource75($uri);
     }
 }
-final class Resource74GetRequest extends Request {
+final class Resource74GetRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -3525,7 +3785,8 @@ final class Resource74GetRequest extends Request {
     /**
      * @return Resource74GetRequest
      */
-    public function withPerPage($perPage) {
+    public function withPerPage($perPage)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -3538,12 +3799,12 @@ final class Resource74GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource74GetRequest
      */
-    public function withPage($page) {
+    public function withPage($page)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -3556,14 +3817,16 @@ final class Resource74GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource75 extends Resource {
+final class Resource75 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function delete ($body = null, array $options = []) {
+    public function delete($body = null, array $options = [])
+    {
 
         return $this->buildRequest('delete', $this->getUri(), $body, $options);
     }
@@ -3571,46 +3834,52 @@ final class Resource75 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource76 extends Resource {
+final class AuthResource extends Resource
+{
 
     /**
      * @return Resource77
      */
-    public function login() {
+    public function login()
+    {
         return new Resource77($this->getUri() . '/login');
     }
 
     /**
      * @return Resource78
      */
-    public function logout() {
+    public function logout()
+    {
         return new Resource78($this->getUri() . '/logout');
     }
 
     /**
      * @return Resource79
      */
-    public function me() {
+    public function me()
+    {
         return new Resource79($this->getUri() . '/me');
     }
 }
-final class Resource77 extends Resource {
+final class Resource77 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -3620,59 +3889,63 @@ final class Resource77 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource78 extends Resource {
+final class Resource78 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
         return $this->buildRequest('get', $this->getUri(), null, $options);
     }
 }
-final class Resource79 extends Resource {
+final class Resource79 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
         return $this->buildRequest('get', $this->getUri(), null, $options);
     }
 }
-final class Resource80 extends Resource {
+final class ProjectsResource extends Resource
+{
 
     /**
      * @return Resource80GetRequest
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -3682,7 +3955,8 @@ final class Resource80 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
@@ -3690,13 +3964,15 @@ final class Resource80 extends Resource {
     /**
      * @return Resource81
      */
-    public function withProjectUuid ($projectUuid) {
-      
+    public function withProjectUuid($projectUuid)
+    {
+
         $uri = $this->template($this->getUri() . '/{projectUuid}', ['projectUuid' => $projectUuid]);
         return new Resource81($uri);
     }
 }
-final class Resource80GetRequest extends Request {
+final class Resource80GetRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -3704,7 +3980,8 @@ final class Resource80GetRequest extends Request {
     /**
      * @return Resource80GetRequest
      */
-    public function withPerPage($perPage) {
+    public function withPerPage($perPage)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -3717,12 +3994,12 @@ final class Resource80GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource80GetRequest
      */
-    public function withPage($page) {
+    public function withPage($page)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -3735,12 +4012,12 @@ final class Resource80GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource80GetRequest
      */
-    public function withRole($role) {
+    public function withRole($role)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -3753,14 +4030,16 @@ final class Resource80GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource81 extends Resource {
+final class Resource81 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
@@ -3768,7 +4047,8 @@ final class Resource81 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function delete ($body = null, array $options = []) {
+    public function delete($body = null, array $options = [])
+    {
 
         return $this->buildRequest('delete', $this->getUri(), $body, $options);
     }
@@ -3776,20 +4056,21 @@ final class Resource81 extends Resource {
     /**
      * @return Resource81GetRequest
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
         return $this->buildRequest('get', $this->getUri(), null, $options, 'Resource81GetRequest');
     }
 }
-final class Resource81GetRequest extends Request {
+final class Resource81GetRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -3797,7 +4078,8 @@ final class Resource81GetRequest extends Request {
     /**
      * @return Resource81GetRequest
      */
-    public function withRole($role) {
+    public function withRole($role)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -3810,20 +4092,21 @@ final class Resource81GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource82 extends Resource {
+final class Resource82 extends Resource
+{
 
     /**
      * @return Resource82GetRequest
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -3833,7 +4116,8 @@ final class Resource82 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
@@ -3841,13 +4125,15 @@ final class Resource82 extends Resource {
     /**
      * @return Resource83
      */
-    public function withSchemaUuid ($schemaUuid) {
-      
+    public function withSchemaUuid($schemaUuid)
+    {
+
         $uri = $this->template($this->getUri() . '/{schemaUuid}', ['schemaUuid' => $schemaUuid]);
         return new Resource83($uri);
     }
 }
-final class Resource82GetRequest extends Request {
+final class Resource82GetRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -3855,7 +4141,8 @@ final class Resource82GetRequest extends Request {
     /**
      * @return Resource82GetRequest
      */
-    public function withPerPage($perPage) {
+    public function withPerPage($perPage)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -3868,12 +4155,12 @@ final class Resource82GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource82GetRequest
      */
-    public function withPage($page) {
+    public function withPage($page)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -3886,34 +4173,37 @@ final class Resource82GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource83 extends Resource {
+final class Resource83 extends Resource
+{
 
     /**
      * @return Resource84
      */
-    public function diff() {
+    public function diff()
+    {
         return new Resource84($this->getUri() . '/diff');
     }
 
     /**
      * @return Resource85
      */
-    public function changes() {
+    public function changes()
+    {
         return new Resource85($this->getUri() . '/changes');
     }
 
     /**
      * @return Resource83GetRequest
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -3923,7 +4213,8 @@ final class Resource83 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function delete ($body = null, array $options = []) {
+    public function delete($body = null, array $options = [])
+    {
 
         return $this->buildRequest('delete', $this->getUri(), $body, $options);
     }
@@ -3931,12 +4222,14 @@ final class Resource83 extends Resource {
     /**
      * @return Resource83PostRequest
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options, 'Resource83PostRequest');
     }
 }
-final class Resource83GetRequest extends Request {
+final class Resource83GetRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -3944,7 +4237,8 @@ final class Resource83GetRequest extends Request {
     /**
      * @return Resource83GetRequest
      */
-    public function withVersion($version) {
+    public function withVersion($version)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -3957,12 +4251,12 @@ final class Resource83GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource83GetRequest
      */
-    public function withRelease($release) {
+    public function withRelease($release)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -3975,9 +4269,10 @@ final class Resource83GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource83PostRequest extends Request {
+final class Resource83PostRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -3985,7 +4280,8 @@ final class Resource83PostRequest extends Request {
     /**
      * @return Resource83PostRequest
      */
-    public function withUpdateReleaseNames($updateReleaseNames) {
+    public function withUpdateReleaseNames($updateReleaseNames)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -3998,12 +4294,12 @@ final class Resource83PostRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource83PostRequest
      */
-    public function withUpdateAssignedReleases($updateAssignedReleases) {
+    public function withUpdateAssignedReleases($updateAssignedReleases)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -4016,40 +4312,45 @@ final class Resource83PostRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource84 extends Resource {
+final class Resource84 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource85 extends Resource {
+final class Resource85 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource86 extends Resource {
+final class MicroschemasResource extends Resource
+{
 
     /**
      * @return Resource86GetRequest
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -4059,7 +4360,8 @@ final class Resource86 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
@@ -4067,13 +4369,15 @@ final class Resource86 extends Resource {
     /**
      * @return Resource87
      */
-    public function withMicroschemaUuid ($microschemaUuid) {
-      
+    public function withMicroschemaUuid($microschemaUuid)
+    {
+
         $uri = $this->template($this->getUri() . '/{microschemaUuid}', ['microschemaUuid' => $microschemaUuid]);
         return new Resource87($uri);
     }
 }
-final class Resource86GetRequest extends Request {
+final class Resource86GetRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -4081,7 +4385,8 @@ final class Resource86GetRequest extends Request {
     /**
      * @return Resource86GetRequest
      */
-    public function withPerPage($perPage) {
+    public function withPerPage($perPage)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -4094,12 +4399,12 @@ final class Resource86GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource86GetRequest
      */
-    public function withPage($page) {
+    public function withPage($page)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -4112,28 +4417,32 @@ final class Resource86GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource87 extends Resource {
+final class Resource87 extends Resource
+{
 
     /**
      * @return Resource88
      */
-    public function changes() {
+    public function changes()
+    {
         return new Resource88($this->getUri() . '/changes');
     }
 
     /**
      * @return Resource89
      */
-    public function diff() {
+    public function diff()
+    {
         return new Resource89($this->getUri() . '/diff');
     }
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
@@ -4141,7 +4450,8 @@ final class Resource87 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function delete ($body = null, array $options = []) {
+    public function delete($body = null, array $options = [])
+    {
 
         return $this->buildRequest('delete', $this->getUri(), $body, $options);
     }
@@ -4149,20 +4459,21 @@ final class Resource87 extends Resource {
     /**
      * @return Resource87GetRequest
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
         return $this->buildRequest('get', $this->getUri(), null, $options, 'Resource87GetRequest');
     }
 }
-final class Resource87GetRequest extends Request {
+final class Resource87GetRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -4170,7 +4481,8 @@ final class Resource87GetRequest extends Request {
     /**
      * @return Resource87GetRequest
      */
-    public function withVersion($version) {
+    public function withVersion($version)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -4183,12 +4495,12 @@ final class Resource87GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource87GetRequest
      */
-    public function withRelease($release) {
+    public function withRelease($release)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -4201,198 +4513,227 @@ final class Resource87GetRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource88 extends Resource {
+final class Resource88 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource89 extends Resource {
+final class Resource89 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource90 extends Resource {
+final class AdminResource extends Resource
+{
 
     /**
      * @return Resource91
      */
-    public function cluster() {
+    public function cluster()
+    {
         return new Resource91($this->getUri() . '/cluster');
     }
 
     /**
      * @return Resource93
      */
-    public function consistency() {
+    public function consistency()
+    {
         return new Resource93($this->getUri() . '/consistency');
     }
 
     /**
      * @return Resource96
      */
-    public function graphdb() {
+    public function graphdb()
+    {
         return new Resource96($this->getUri() . '/graphdb');
     }
 
     /**
      * @return Resource99
      */
-    public function jobs() {
+    public function jobs()
+    {
         return new Resource99($this->getUri() . '/jobs');
     }
 
     /**
      * @return Resource102
      */
-    public function plugins() {
+    public function plugins()
+    {
         return new Resource102($this->getUri() . '/plugins');
     }
 
     /**
      * @return Resource104
      */
-    public function status() {
+    public function status()
+    {
         return new Resource104($this->getUri() . '/status');
     }
 
     /**
      * @return Resource105
      */
-    public function processJobs() {
+    public function processJobs()
+    {
         return new Resource105($this->getUri() . '/processJobs');
     }
 }
-final class Resource91 extends Resource {
+final class Resource91 extends Resource
+{
 
     /**
      * @return Resource92
      */
-    public function status() {
+    public function status()
+    {
         return new Resource92($this->getUri() . '/status');
     }
 }
-final class Resource92 extends Resource {
+final class Resource92 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
         return $this->buildRequest('get', $this->getUri(), null, $options);
     }
 }
-final class Resource93 extends Resource {
+final class Resource93 extends Resource
+{
 
     /**
      * @return Resource94
      */
-    public function repair() {
+    public function repair()
+    {
         return new Resource94($this->getUri() . '/repair');
     }
 
     /**
      * @return Resource95
      */
-    public function check() {
+    public function check()
+    {
         return new Resource95($this->getUri() . '/check');
     }
 }
-final class Resource94 extends Resource {
+final class Resource94 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource95 extends Resource {
+final class Resource95 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
         return $this->buildRequest('get', $this->getUri(), null, $options);
     }
 }
-final class Resource96 extends Resource {
+final class Resource96 extends Resource
+{
 
     /**
      * @return Resource97
      */
-    public function restore() {
+    public function restore()
+    {
         return new Resource97($this->getUri() . '/restore');
     }
 
     /**
      * @return Resource98
      */
-    public function backup() {
+    public function backup()
+    {
         return new Resource98($this->getUri() . '/backup');
     }
 }
-final class Resource97 extends Resource {
+final class Resource97 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource98 extends Resource {
+final class Resource98 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource99 extends Resource {
+final class Resource99 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -4402,31 +4743,34 @@ final class Resource99 extends Resource {
     /**
      * @return Resource100
      */
-    public function withJobUuid ($jobUuid) {
-      
+    public function withJobUuid($jobUuid)
+    {
+
         $uri = $this->template($this->getUri() . '/{jobUuid}', ['jobUuid' => $jobUuid]);
         return new Resource100($uri);
     }
 }
-final class Resource100 extends Resource {
+final class Resource100 extends Resource
+{
 
     /**
      * @return Resource101
      */
-    public function error() {
+    public function error()
+    {
         return new Resource101($this->getUri() . '/error');
     }
 
     /**
      * @return RequestInterface
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -4436,33 +4780,37 @@ final class Resource100 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function delete ($body = null, array $options = []) {
+    public function delete($body = null, array $options = [])
+    {
 
         return $this->buildRequest('delete', $this->getUri(), $body, $options);
     }
 }
-final class Resource101 extends Resource {
+final class Resource101 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function delete ($body = null, array $options = []) {
+    public function delete($body = null, array $options = [])
+    {
 
         return $this->buildRequest('delete', $this->getUri(), $body, $options);
     }
 }
-final class Resource102 extends Resource {
+final class Resource102 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -4472,7 +4820,8 @@ final class Resource102 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
@@ -4480,24 +4829,26 @@ final class Resource102 extends Resource {
     /**
      * @return Resource103
      */
-    public function withUuid ($uuid) {
-      
+    public function withUuid($uuid)
+    {
+
         $uri = $this->template($this->getUri() . '/{uuid}', ['uuid' => $uuid]);
         return new Resource103($uri);
     }
 }
-final class Resource103 extends Resource {
+final class Resource103 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
@@ -4507,136 +4858,156 @@ final class Resource103 extends Resource {
     /**
      * @return RequestInterface
      */
-    public function delete ($body = null, array $options = []) {
+    public function delete($body = null, array $options = [])
+    {
 
         return $this->buildRequest('delete', $this->getUri(), $body, $options);
     }
 }
-final class Resource104 extends Resource {
+final class Resource104 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
         return $this->buildRequest('get', $this->getUri(), null, $options);
     }
 }
-final class Resource105 extends Resource {
+final class Resource105 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource106 extends Resource {
+final class SearchResource extends Resource
+{
 
     /**
      * @return Resource107
      */
-    public function groups() {
+    public function groups()
+    {
         return new Resource107($this->getUri() . '/groups');
     }
 
     /**
      * @return Resource108
      */
-    public function nodes() {
+    public function nodes()
+    {
         return new Resource108($this->getUri() . '/nodes');
     }
 
     /**
      * @return Resource109
      */
-    public function roles() {
+    public function roles()
+    {
         return new Resource109($this->getUri() . '/roles');
     }
 
     /**
      * @return Resource110
      */
-    public function status() {
+    public function status()
+    {
         return new Resource110($this->getUri() . '/status');
     }
 
     /**
      * @return Resource111
      */
-    public function tagFamilies() {
+    public function tagFamilies()
+    {
         return new Resource111($this->getUri() . '/tagFamilies');
     }
 
     /**
      * @return Resource112
      */
-    public function users() {
+    public function users()
+    {
         return new Resource112($this->getUri() . '/users');
     }
 
     /**
      * @return Resource113
      */
-    public function microschemas() {
+    public function microschemas()
+    {
         return new Resource113($this->getUri() . '/microschemas');
     }
 
     /**
      * @return Resource114
      */
-    public function schemas() {
+    public function schemas()
+    {
         return new Resource114($this->getUri() . '/schemas');
     }
 
     /**
      * @return Resource115
      */
-    public function tags() {
+    public function tags()
+    {
         return new Resource115($this->getUri() . '/tags');
     }
 
     /**
      * @return Resource116
      */
-    public function projects() {
+    public function projects()
+    {
         return new Resource116($this->getUri() . '/projects');
     }
 
     /**
      * @return Resource117
      */
-    public function clear() {
+    public function clear()
+    {
         return new Resource117($this->getUri() . '/clear');
     }
 
     /**
      * @return Resource118
      */
-    public function sync() {
+    public function sync()
+    {
         return new Resource118($this->getUri() . '/sync');
     }
 }
-final class Resource107 extends Resource {
+final class Resource107 extends Resource
+{
 
     /**
      * @return Resource107PostRequest
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options, 'Resource107PostRequest');
     }
 }
-final class Resource107PostRequest extends Request {
+final class Resource107PostRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -4644,7 +5015,8 @@ final class Resource107PostRequest extends Request {
     /**
      * @return Resource107PostRequest
      */
-    public function withPerPage($perPage) {
+    public function withPerPage($perPage)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -4657,12 +5029,12 @@ final class Resource107PostRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource107PostRequest
      */
-    public function withPage($page) {
+    public function withPage($page)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -4675,19 +5047,22 @@ final class Resource107PostRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource108 extends Resource {
+final class Resource108 extends Resource
+{
 
     /**
      * @return Resource108PostRequest
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options, 'Resource108PostRequest');
     }
 }
-final class Resource108PostRequest extends Request {
+final class Resource108PostRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -4695,7 +5070,8 @@ final class Resource108PostRequest extends Request {
     /**
      * @return Resource108PostRequest
      */
-    public function withPerPage($perPage) {
+    public function withPerPage($perPage)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -4708,12 +5084,12 @@ final class Resource108PostRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource108PostRequest
      */
-    public function withPage($page) {
+    public function withPage($page)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -4726,19 +5102,22 @@ final class Resource108PostRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource109 extends Resource {
+final class Resource109 extends Resource
+{
 
     /**
      * @return Resource109PostRequest
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options, 'Resource109PostRequest');
     }
 }
-final class Resource109PostRequest extends Request {
+final class Resource109PostRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -4746,7 +5125,8 @@ final class Resource109PostRequest extends Request {
     /**
      * @return Resource109PostRequest
      */
-    public function withPerPage($perPage) {
+    public function withPerPage($perPage)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -4759,12 +5139,12 @@ final class Resource109PostRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource109PostRequest
      */
-    public function withPage($page) {
+    public function withPage($page)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -4777,37 +5157,41 @@ final class Resource109PostRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource110 extends Resource {
+final class Resource110 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function get ($query = null, array $options = []) {
-
+    public function get($query = null, array $options = [])
+    {
 
         if (!is_array($query)) {
             $query = Psr7\parse_query($query);
         }
-        if (isset($options['query'])) {        
+        if (isset($options['query'])) {
             $query = array_merge($options['query'], $query);
         }
         $options['query'] = $query;
         return $this->buildRequest('get', $this->getUri(), null, $options);
     }
 }
-final class Resource111 extends Resource {
+final class Resource111 extends Resource
+{
 
     /**
      * @return Resource111PostRequest
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options, 'Resource111PostRequest');
     }
 }
-final class Resource111PostRequest extends Request {
+final class Resource111PostRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -4815,7 +5199,8 @@ final class Resource111PostRequest extends Request {
     /**
      * @return Resource111PostRequest
      */
-    public function withPerPage($perPage) {
+    public function withPerPage($perPage)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -4828,12 +5213,12 @@ final class Resource111PostRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource111PostRequest
      */
-    public function withPage($page) {
+    public function withPage($page)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -4846,19 +5231,22 @@ final class Resource111PostRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource112 extends Resource {
+final class Resource112 extends Resource
+{
 
     /**
      * @return Resource112PostRequest
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options, 'Resource112PostRequest');
     }
 }
-final class Resource112PostRequest extends Request {
+final class Resource112PostRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -4866,7 +5254,8 @@ final class Resource112PostRequest extends Request {
     /**
      * @return Resource112PostRequest
      */
-    public function withPerPage($perPage) {
+    public function withPerPage($perPage)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -4879,12 +5268,12 @@ final class Resource112PostRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource112PostRequest
      */
-    public function withPage($page) {
+    public function withPage($page)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -4897,19 +5286,22 @@ final class Resource112PostRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource113 extends Resource {
+final class Resource113 extends Resource
+{
 
     /**
      * @return Resource113PostRequest
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options, 'Resource113PostRequest');
     }
 }
-final class Resource113PostRequest extends Request {
+final class Resource113PostRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -4917,7 +5309,8 @@ final class Resource113PostRequest extends Request {
     /**
      * @return Resource113PostRequest
      */
-    public function withPerPage($perPage) {
+    public function withPerPage($perPage)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -4930,12 +5323,12 @@ final class Resource113PostRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource113PostRequest
      */
-    public function withPage($page) {
+    public function withPage($page)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -4948,19 +5341,22 @@ final class Resource113PostRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource114 extends Resource {
+final class Resource114 extends Resource
+{
 
     /**
      * @return Resource114PostRequest
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options, 'Resource114PostRequest');
     }
 }
-final class Resource114PostRequest extends Request {
+final class Resource114PostRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -4968,7 +5364,8 @@ final class Resource114PostRequest extends Request {
     /**
      * @return Resource114PostRequest
      */
-    public function withPerPage($perPage) {
+    public function withPerPage($perPage)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -4981,12 +5378,12 @@ final class Resource114PostRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource114PostRequest
      */
-    public function withPage($page) {
+    public function withPage($page)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -4999,19 +5396,22 @@ final class Resource114PostRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource115 extends Resource {
+final class Resource115 extends Resource
+{
 
     /**
      * @return Resource115PostRequest
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options, 'Resource115PostRequest');
     }
 }
-final class Resource115PostRequest extends Request {
+final class Resource115PostRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -5019,7 +5419,8 @@ final class Resource115PostRequest extends Request {
     /**
      * @return Resource115PostRequest
      */
-    public function withPerPage($perPage) {
+    public function withPerPage($perPage)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -5032,12 +5433,12 @@ final class Resource115PostRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource115PostRequest
      */
-    public function withPage($page) {
+    public function withPage($page)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -5050,19 +5451,22 @@ final class Resource115PostRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource116 extends Resource {
+final class Resource116 extends Resource
+{
 
     /**
      * @return Resource116PostRequest
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options, 'Resource116PostRequest');
     }
 }
-final class Resource116PostRequest extends Request {
+final class Resource116PostRequest extends Request
+{
 
     private $query;
     private $queryParts;
@@ -5070,7 +5474,8 @@ final class Resource116PostRequest extends Request {
     /**
      * @return Resource116PostRequest
      */
-    public function withPerPage($perPage) {
+    public function withPerPage($perPage)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -5083,12 +5488,12 @@ final class Resource116PostRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
 
     /**
      * @return Resource116PostRequest
      */
-    public function withPage($page) {
+    public function withPage($page)
+    {
         $query = $this->getUri()->getQuery();
         if ($this->query !== $query) {
             $this->queryParts = Psr7\parse_query($query);
@@ -5101,24 +5506,28 @@ final class Resource116PostRequest extends Request {
         $this->query = Psr7\build_query($this->queryParts);
         return $this->withUri($this->getUri()->withQuery($this->query));
     }
-                
+
 }
-final class Resource117 extends Resource {
+final class Resource117 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }
 }
-final class Resource118 extends Resource {
+final class Resource118 extends Resource
+{
 
     /**
      * @return RequestInterface
      */
-    public function post ($body = null, array $options = []) {
+    public function post($body = null, array $options = [])
+    {
 
         return $this->buildRequest('post', $this->getUri(), $body, $options);
     }

@@ -1,17 +1,22 @@
 <?php
 
-language
+class NodeResponse
+{
 
-parentNode
+    private $language;
 
-project
+    private $parentNode;
 
-tags
+    private $project;
 
-childrenInfo
+    private $tags;
 
-schema
+    private $childrenInfo;
 
-container
+    private $schema;
 
-path
+    private $container;
+
+    private $path;
+
+}

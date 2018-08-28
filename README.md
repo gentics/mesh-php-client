@@ -11,7 +11,7 @@ composer require gentics-mesh-rest-api/raml-php-sdk
 ## Usage
 
 ```php
-namespace GenticsMeshRestApi\Raml;
+namespace GenticsMeshRestApi;
 
 require_once __DIR__ . '/vendor/autoload.php';
 

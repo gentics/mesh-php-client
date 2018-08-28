@@ -81,7 +81,7 @@ class TokenProvider extends AbstractProvider
     {
         $this->assertRequiredOptions($options);
 
-        $possible   = $this->getConfigurableOptions();
+        $possible = $this->getConfigurableOptions();
         $configured = array_intersect_key($options, array_flip($possible));
 
         foreach ($configured as $key => $value) {
@@ -122,7 +122,7 @@ class TokenProvider extends AbstractProvider
     {
         return [
             'urlAccessToken',
-            'urlAuthorize'
+            'urlAuthorize',
         ];
     }
 
@@ -207,7 +207,7 @@ class TokenProvider extends AbstractProvider
     {
         if (!empty($data[$this->responseError])) {
             $error = $data[$this->responseError];
-            $code  = $this->responseCode ? $data[$this->responseCode] : 0;
+            $code = $this->responseCode ? $data[$this->responseCode] : 0;
             throw new IdentityProviderException($error, $code, $data);
         }
     }
@@ -231,8 +231,8 @@ class TokenProvider extends AbstractProvider
         $options = [
             'headers' => [
                 'content-type' => 'application/x-www-form-urlencoded',
-                'authorization' => 'Basic ' . base64_encode($params['client_id'] . ':' . $params['client_secret'])
-            ]
+                'authorization' => 'Basic ' . base64_encode($params['client_id'] . ':' . $params['client_secret']),
+            ],
         ];
         if ($this->getAccessTokenMethod() === self::METHOD_POST) {
             $options['body'] = $this->getAccessTokenBody($params);
@@ -240,7 +240,7 @@ class TokenProvider extends AbstractProvider
 
         return $options;
     }
-    
+
     public function getAccessToken($grant, array $options = [])
     {
         if (!is_null($this->scope) && !isset($options['scope'])) {
@@ -249,4 +249,3 @@ class TokenProvider extends AbstractProvider
         return parent::getAccessToken($grant, $options);
     }
 }
-

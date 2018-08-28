@@ -1,5 +1,7 @@
 <?php
 
-abstract class AbstractListResponse implements iRestModel {
+namespace GenticsMeshRestApi;
+
+abstract class AbstractListResponse implements RestModelInterface {
 
 }

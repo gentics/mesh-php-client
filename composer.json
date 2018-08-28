@@ -8,11 +8,8 @@
     "sdk"
   ],
   "autoload": {
-    "files": [
-      "classes.php"
-    ],
     "psr-4": {
-      "GenticsMeshRestApi\\Raml\\": "src/"
+      "GenticsMeshRestApi\\": "src/"
     }
   },
   "require": {
@@ -23,5 +20,8 @@
     "psr/cache": "^1.0",
     "cache/adapter-common": "^0.3",
     "cache/filesystem-adapter": "^0.3"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^6"
   }
 }
