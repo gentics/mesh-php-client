@@ -2,8 +2,10 @@
 
 namespace GenticsMeshRestApi\Rest;
 
-class MeshRequest
-{
+use GuzzleHttp\Psr7\Request as HttpRequest;
 
+
+class MeshRequest extends HttpRequest
+{
 
 }

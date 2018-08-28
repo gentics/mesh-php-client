@@ -3,15 +3,14 @@
 namespace GenticsMeshRestApi;
 
 use Cache\Adapter\Filesystem\FilesystemCachePool;
+use GenticsMeshRestApi\Rest\MeshRequest;
+use GenticsMeshRestApi\Rest\Request;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\HandlerStack;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use Psr\Cache\CacheItemPoolInterface;
-
-use GenticsMeshRestApi\Rest\MeshRequest;
-use GenticsMeshRestApi\Rest\Request;
 
 class MeshClient extends HttpClient implements
 Methods\UsersMethodsInterface,
@@ -92,7 +91,7 @@ Methods\WebrootMethodsInterface
          * @var RequestInterface $request
          */
         //$request = new $requestClass($method, $this->baseUri . $uri, $headers, $body);
-        $request = new \GenticsMeshRestApi\Rest\MeshRequest();
+        $request = new \GenticsMeshRestApi\Rest\MeshRequest($method, $this->baseUri . $uri, $headers, $body);
 
         if (isset($options['query'])) {
             ksort($options['query']);
@@ -107,11 +106,12 @@ Methods\WebrootMethodsInterface
 
     public function findNodeByUuid(string $projectName, string $uuid, array $parameters = []): MeshRequest
     {
-        return $this->buildRequest("GET");
+        return $this->buildRequest("GET", "/" . $projectName . "/nodes/" . $uuid);
     }
 
-    public function findNodes(string $projectName, array $parameters = []): MeshRequest {
-        
+    public function findNodes(string $projectName, array $parameters = []): MeshRequest
+    {
+        return $this->buildRequest("GET", "/" . $projectName . "/nodes");
     }
 
     public function findNodesForTag(string $projectName, string $tagFamilyUuid, string $tagUuid, array $parameters = [])
@@ -649,7 +649,7 @@ Methods\WebrootMethodsInterface
 
     public function me(): MeshRequest
     {
-
+        return $this->buildRequest("GET", "/auth/me");
     }
 
     // Branch Methods
