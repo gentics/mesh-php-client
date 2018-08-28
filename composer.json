@@ -1,5 +1,5 @@
 {
-  "name": "gentics-mesh-rest-api/raml-php-sdk",
+  "name": "gentics/mesh-php-client",
   "type": "library",
   "license": "Apache-2.0",
   "keywords": [
