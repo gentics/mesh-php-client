@@ -10,9 +10,10 @@ interface GraphQLMethodsInterface
     /**
      * Invoke the GraphQL request.
      * 
-     * @param $project
+     * @param $projectName
      * @param $query
+     * @param $parameters
      */
-    public function graphQL(string $project, string $query): MeshRequest;
+    public function graphQL(string $projectName, $query, array $parameters = []): MeshRequest;
 
 }
