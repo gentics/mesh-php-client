@@ -1,6 +1,7 @@
 {
   "name": "gentics/mesh-php-client",
   "type": "library",
+  "description": "Gentics Mesh PHP Client Library",
   "license": "Apache-2.0",
   "keywords": [
     "mesh",
@@ -13,7 +14,7 @@
     }
   },
   "require": {
-    "php": ">=5.6",
+    "php": ">=7.0",
     "guzzlehttp/guzzle": "^6.0"
   },
   "require-dev": {

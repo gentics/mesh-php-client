@@ -22,13 +22,19 @@ class MeshRequest extends HttpRequest
         parent::__construct($method, $uri, $headers);
     }
 
+    private function wrapResponse(\GuzzleHttp\Psr7\Response $response)
+    {
+        return new MeshResponse($response);
+    }
+
     public function send()
     {
-        return $this->client->send($this, $this->options);
+        return $this->wrapResponse($this->client->send($this, $this->options));
     }
 
     public function sendAsync()
     {
         return $this->client->sendAsync($this, $this->options);
     }
+
 }

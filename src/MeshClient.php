@@ -32,12 +32,16 @@ Methods\WebrootMethodsInterface
 
     private $baseUri;
 
+    /**
+     * JWT Token / API key to be used for authentication.
+     */
     private $token;
 
-    public function __construct(string $baseUri = "http://localhost:8080/api/v1")
+    public function __construct(string $baseUri = "http://localhost:8080/api/v1", array $config = [])
     {
         $this->baseUri = $baseUri;
-        parent::__construct();
+        $config["cookies"] = true;
+        parent::__construct($config);
     }
 
     /**
@@ -61,6 +65,13 @@ Methods\WebrootMethodsInterface
         $request = new \GenticsMeshRestApi\Rest\MeshRequest($this, $method, $this->baseUri . $uri, $headers, $body, $options);
 
         return $request;
+    }
+
+
+    // Client API Methods
+
+    function setAPIKey($key) {
+        $this->token = $key;
     }
 
     // Node Methods
@@ -860,14 +871,13 @@ Methods\WebrootMethodsInterface
 
     // Webroot Methods
 
-    public function webroot(string $project, string $path): MeshRequest
+    public function webroot(string $projectName, string $path, array $parameters = []): MeshRequest
     {
-        return webroot(projectName, path . split("/"), null, $parameters);
+        return $this->buildRequest("GET", "/" . $projectName . "/webroot/" . $path, null, $parameters);
     }
 
     private function encodeSegment(string $segment)
     {
-
         //TODO encode
         return $segment;
     }

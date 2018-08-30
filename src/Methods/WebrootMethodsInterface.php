@@ -10,10 +10,11 @@ interface WebrootMethodsInterface
     /**
      * Load a node via webroot path.
      *
-     * @param project Project to be used
+     * @param projectName Project to be used
      * @param path Path to the node
+     * @param parameters Request parameters
      * @return MeshRequest
      */
-    public function webroot(string $project, string $path): MeshRequest;
+    public function webroot(string $projectName, string $path, array $parameters = []): MeshRequest;
 
 }
