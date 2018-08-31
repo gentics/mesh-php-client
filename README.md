@@ -47,6 +47,7 @@ $client->login("admin", "admin")->wait();
 
 // Or use a dedicated API key which will never expire
 // You can use the mesh-cli to generate a key
+// Setting the API key will invalidate any previously set login token information
 $client->setAPIKey("eyJ0eXAiOiJKV1QiLC … ZYYJbD8HllF6XZT0xRTxr3i4b9PY");
 ```
 
@@ -72,7 +73,8 @@ The webroot endpoint is also able to directly return binary data.
 $client = new MeshClient("http://localhost:8888/api/v1");
 $request = $client->webroot("demo", "/images/yacht-pelorus.jpg");
 $response = $request->send();
-$type = $response->getHeader("content-type")[0];
+// You can check whether the webroot response returns json or otherwise binary data (e.g. image data)
+$response->isJson();
 ```
 
 

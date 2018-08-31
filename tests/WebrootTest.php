@@ -15,6 +15,7 @@ final class WebrootTest extends AbstractMeshTest
         $client = new MeshClient("http://localhost:8080/api/v1");
         $request = $client->webroot("demo", "/automobiles");
         $response = $request->send();
+        $this->assertTrue($response->isJson());
         //echo "StatusCode:" . $response->getStatusCode() . "\n";
         //echo "StatusCode:" . $response->getProtocolVersion() . "\n";
         //echo $response->getHeader("set-cookie")[0];
@@ -28,11 +29,11 @@ final class WebrootTest extends AbstractMeshTest
 
     public function testWebrootBinary() {
         $path = "/images/yacht-pelorus.jpg";
-        $client = new MeshClient("http://localhost:8080/api/v1");
+        $client = new MeshClient("http://localhost:8888/api/v1");
         $request = $client->webroot("demo", $path);
+        // $request = $request->withAddedHeader('Accept', 'application/json');
         $response = $request->send();
-        //print_r($response->toJson());
-        echo "\n" . $response->getHeader("content-type")[0] . "\n";
+        $this->assertFalse($response->isJson());
         echo("\nBinary: " . get_class($response->getBody()) . "\n");
     }
 

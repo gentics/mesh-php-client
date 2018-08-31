@@ -18,9 +18,30 @@ class MeshResponse implements ResponseInterface
         $this->response = $response;
     }
 
+    /**
+     * Convert the response body to a json object.
+     * 
+     * @return mixed
+     */
     public function toJson()
     {
         return json_decode($this->response->getBody());
+    }
+
+    /**
+     * Check whether the response is returning json by inspecting the response header.
+     * 
+     * @return bool
+     */
+    public function isJson()
+    {
+        $type = $this->getHeader("content-type")[0];
+        return $this->has_prefix($type, "application/json");
+    }
+
+    private function has_prefix($string, $prefix)
+    {
+        return ((substr($string, 0, strlen($prefix)) == $prefix) ? true : false);
     }
 
     // Wrapped methods
