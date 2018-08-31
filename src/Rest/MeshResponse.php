@@ -1,11 +1,14 @@
 <?php
 
-namespace GenticsMeshRestApi\Rest;
+namespace Gentics\Mesh\Client\Rest;
 
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
+/**
+ * Wrapper for a regular Guzzle Response.
+ */
 class MeshResponse implements ResponseInterface
 {
     private $response;

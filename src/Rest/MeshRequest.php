@@ -1,10 +1,13 @@
 <?php
 
-namespace GenticsMeshRestApi\Rest;
+namespace Gentics\Mesh\Client\Rest;
 
-use GenticsMeshRestApi\MeshClient;
+use Gentics\Mesh\Client\MeshClient;
 use GuzzleHttp\Psr7\Request as HttpRequest;
 
+/**
+ * Extended HttpRequest which is able to return MeshResponses.
+ */
 class MeshRequest extends HttpRequest
 {
     private $client;
@@ -22,6 +25,9 @@ class MeshRequest extends HttpRequest
         parent::__construct($method, $uri, $headers);
     }
 
+    /**
+     * Wrap the response into a mesh response which is able to return the parsed JSON object.
+     */
     private function wrapResponse(\GuzzleHttp\Psr7\Response $response)
     {
         return new MeshResponse($response);

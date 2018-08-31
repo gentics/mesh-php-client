@@ -1,8 +1,8 @@
 <?php
 
-namespace GenticsMeshRestApi\Methods;
+namespace Gentics\Mesh\Client\Methods;
 
-use GenticsMeshRestApi\Rest\MeshRequest;
+use Gentics\Mesh\Client\Rest\MeshRequest;
 
 interface APIInfoMethodsInterface
 {

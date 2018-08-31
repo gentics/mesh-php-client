@@ -10,7 +10,12 @@
   ],
   "autoload": {
     "psr-4": {
-      "GenticsMeshRestApi\\": "src/"
+      "Gentics\\Mesh\\Client\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Gentics\\Mesh\\ClientTest\\": "tests/"
     }
   },
   "require": {

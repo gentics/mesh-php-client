@@ -1,6 +1,6 @@
 <?php
 
-namespace GenticsMeshRestApi;
+namespace Gentics\Mesh\Client;
 
 interface RestModelInterface {
 

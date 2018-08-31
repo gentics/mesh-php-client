@@ -1,10 +1,13 @@
 <?php
 declare (strict_types = 1);
 
-use GenticsMeshRestApi\MeshClient;
+namespace Gentics\Mesh\ClientTest;
+
+use Gentics\Mesh\ClientTest\AbstractMeshTest;
+use Gentics\Mesh\Client\MeshClient;
 use PHPUnit\Framework\TestCase;
 
-final class MeshClientTest extends TestCase
+final class MeshClientTest extends AbstractMeshTest
 {
 
     
@@ -43,11 +46,20 @@ final class MeshClientTest extends TestCase
     public function testAPIKey()
     {
         $client = new MeshClient("http://localhost:8080/api/v1");
-        $client->setAPIKey("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyVXVpZCI6IjNmMDU2ZDQwZGZkYTQ5YjQ4NTZkNDBkZmRhOTliNGZhIiwianRpIjoieFE3eXA1eURaajlmIiwiaWF0IjoxNTM1NjM2NTI5fQ.VQRII_zZOVk36-OZYYJbD8HllF6XZT0xRTxr3i4b9PY");
-        $request = $client->me();
-        $response = $request->send();
-        $json = $response->toJson();
-        $this->assertEquals("test", $json->username);
+        $client->login("admin","admin")->wait();
+
+        $name = "guzzle-" . microtime();
+        $request = [
+            "username" => $name,
+            "password" => "geheim",
+        ];
+        
+        $userResp = $client->createUser($request)->send()->toJson();
+        $keyInfo = $client->issueAPIKey($userResp->uuid)->send()->toJson();
+        
+        $client->setAPIKey($keyInfo->token);
+        $json = $client->me()->send()->toJson();
+        $this->assertEquals($name, $json->username);
     }
 
 }

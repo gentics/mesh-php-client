@@ -1,8 +1,8 @@
 <?php
 
-namespace GenticsMeshRestApi\Methods;
+namespace Gentics\Mesh\Client\Methods;
 
-use GenticsMeshRestApi\Rest\MeshRequest;
+use Gentics\Mesh\Client\Rest\MeshRequest;
 
 interface UsersMethodsInterface
 {
@@ -94,14 +94,14 @@ interface UsersMethodsInterface
     public function getUserResetToken(string $userUuid): MeshRequest;
 
     /**
-     * Generate a new API token for the user. The token is valid until a new token is generated. Generating a new token will invalidate the previously generated
+     * Generate a new API key for the user. The key is valid until a new key is generated. Generating a new key will invalidate the previously generated
      * one.
      *
      * @param userUuid
      *            User uuid
      * @return
      */
-    public function issueAPIToken(string $userUuid): MeshRequest;
+    public function issueAPIKey(string $userUuid): MeshRequest;
 
     /**
      * Invalidate the currently active API token.

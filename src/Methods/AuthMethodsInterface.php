@@ -1,8 +1,8 @@
 <?php
 
-namespace GenticsMeshRestApi\Methods;
+namespace Gentics\Mesh\Client\Methods;
 
-use GenticsMeshRestApi\Rest\MeshRequest;
+use Gentics\Mesh\Client\Rest\MeshRequest;
 use GuzzleHttp\Promise\Promise;
 
 interface AuthMethodsInterface
@@ -16,13 +16,6 @@ interface AuthMethodsInterface
      * @return
      */
     public function login(string $username, string $password): Promise;
-
-    /**
-     * Logout the user.
-     *
-     * @return
-     */
-    public function logout(): MeshRequest;
 
     /**
      * Return the currently active user's rest model data.

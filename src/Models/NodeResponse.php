@@ -1,5 +1,7 @@
 <?php
 
+namespace Gentics\Mesh\Client\Models;
+
 class NodeResponse
 {
 
