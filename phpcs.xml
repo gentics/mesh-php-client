@@ -1,0 +1,5 @@
+<!-- Configuration for squizlabs/PHP_CodeSniffer -->
+<?xml version="1.0" encoding="utf-8" ?>
+<ruleset name="coding-standard">
+    <rule ref="PSR2"/>
+</ruleset>

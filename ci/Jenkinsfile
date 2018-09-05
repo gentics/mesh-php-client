@@ -1,0 +1,83 @@
+@Library('jenkins-pipeline-library') import com.gentics.*
+JobContext.set(this)
+
+
+
+pipeline {
+	agent {
+		kubernetes {
+			label env.BUILD_TAG
+			defaultContainer 'build'
+			yaml """
+apiVersion: v1
+kind: Pod
+spec:
+  volumes:
+  - name: cache
+    hostPath:
+      path: /opt/kubernetes/cache
+
+  containers:
+  - name: build
+    image: """ + buildEnvironmentDockerImage("ci/Dockerfile.build") + """
+    imagePullPolicy: Always
+    command:
+    - cat
+    tty: true
+    resources:
+      requests:
+        cpu: 2
+        memory: 1Gi
+    volumeMounts:
+    - mountPath: /home/jenkins/.composer/cache
+      name: cache
+      subPath: composer/cache
+"""
+		}
+	}
+
+	options {
+		timestamps()
+		timeout(time: 1, unit: 'HOURS')
+		ansiColor('xterm')
+	}
+
+    environment { 
+        GITLAB_WEBHOOK_SECRETTOKEN = credentials('gitlab-webhook-secrettoken') 
+    }
+
+	triggers {
+		githubPush()
+	}
+
+	stages {
+		stage("Build") {
+			steps {
+				githubBuildStarted()
+
+				script {
+					// 0 = OK, 1 = UNSTABLE, 2 = ERROR
+					def statusCode = sh script: "./ci/build.sh", returnStatus: true
+					if (statusCode == 1) {
+						currentBuild.result = 'UNSTABLE'
+					} else if (statusCode > 1) {
+						currentBuild.result = 'FAILURE'
+					}
+				}
+			}
+
+			post {
+				always {
+					junit  ".reports/*.xml"
+				}
+			}
+		}
+	}
+
+	post {
+		always {
+			githubBuildEnded()
+			notifyMattermostUsers()
+		}
+	}
+}
