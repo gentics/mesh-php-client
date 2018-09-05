@@ -42,10 +42,6 @@ spec:
 		ansiColor('xterm')
 	}
 
-    environment { 
-        GITLAB_WEBHOOK_SECRETTOKEN = credentials('gitlab-webhook-secrettoken') 
-    }
-
 	triggers {
 		githubPush()
 	}
