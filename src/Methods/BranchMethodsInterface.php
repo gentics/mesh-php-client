@@ -93,8 +93,11 @@ interface BranchMethodsInterface
      * @param microschemaVersionReferences
      * @return
      */
-    public function assignBranchMicroschemaVersions(string $projectName, string $branchUuid,
-        $microschemaVersionReferences): MeshRequest;
+    public function assignBranchMicroschemaVersions(
+        string $projectName,
+        string $branchUuid,
+        $microschemaVersionReferences
+    ): MeshRequest;
 
     /**
      * Invoke the node migration for not yet migrated nodes of schemas that are assigned to the branch.
@@ -113,5 +116,4 @@ interface BranchMethodsInterface
      * @return
      */
     public function migrateBranchMicroschemas(string $projectName, string $branchUuid): MeshRequest;
-
 }

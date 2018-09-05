@@ -2,6 +2,6 @@
 
 namespace Gentics\Mesh\Client\Models;
 
-abstract class AbstractListResponse implements RestModelInterface {
-
+abstract class AbstractListResponse implements RestModelInterface
+{
 }

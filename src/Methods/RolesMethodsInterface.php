@@ -90,5 +90,4 @@ interface RolesMethodsInterface
      * @return
      */
     public function updateRole(string $uuid, $restRole): MeshRequest;
-
 }

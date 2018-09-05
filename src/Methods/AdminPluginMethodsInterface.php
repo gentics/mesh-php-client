@@ -47,5 +47,4 @@ interface AdminPluginMethodsInterface
      * @return
      */
     public function repairConsistency(): MeshRequest;
-
 }

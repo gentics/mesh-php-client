@@ -179,8 +179,12 @@ interface NodesMethodsInterface
      * @param parameters
      * @return Mesh request which can be invoked
      */
-    public function updateTagsForNode(string $projectName, string $nodeUuid, $request,
-        array $parameters = []): MeshRequest;
+    public function updateTagsForNode(
+        string $projectName,
+        string $nodeUuid,
+        $request,
+        array $parameters = []
+    ): MeshRequest;
 
     /**
      * Get the publish status of a node
@@ -206,8 +210,12 @@ interface NodesMethodsInterface
      * @param parameters
      * @return Mesh request which can be invoked
      */
-    public function getNodeLanguagePublishStatus(string $projectName, string $nodeUuid, string $languageTag,
-        array $parameters = []): MeshRequest;
+    public function getNodeLanguagePublishStatus(
+        string $projectName,
+        string $nodeUuid,
+        string $languageTag,
+        array $parameters = []
+    ): MeshRequest;
 
     /**
      * Publish a node and all its languages.
@@ -258,5 +266,4 @@ interface NodesMethodsInterface
      * @return Mesh request which can be invoked
      */
     public function takeNodeLanguageOffline(string $projectName, string $nodeUuid, string $languageTag, array $parameters = []): MeshRequest;
-
 }

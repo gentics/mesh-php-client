@@ -31,5 +31,4 @@ interface UtilityMethodsInterface
      * @return MeshRequest
      */
     public function validateMicroschema($microschema): MeshRequest;
-
 }

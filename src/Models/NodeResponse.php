@@ -4,7 +4,6 @@ namespace Gentics\Mesh\Client\Models;
 
 class NodeResponse
 {
-
     private $language;
 
     private $parentNode;
@@ -20,5 +19,4 @@ class NodeResponse
     private $container;
 
     private $path;
-
 }

@@ -2,6 +2,6 @@
 
 namespace Gentics\Mesh\Client\Models;
 
-class NodeListResponse extends AbstractListResponse {
-
+class NodeListResponse extends AbstractListResponse
+{
 }

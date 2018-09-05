@@ -2,6 +2,6 @@
 
 namespace Gentics\Mesh\Client\Models;
 
-class UserResponse implements RestModelInterace {
-
+class UserResponse implements RestModelInterace
+{
 }

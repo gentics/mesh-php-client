@@ -42,5 +42,4 @@ class MeshRequest extends HttpRequest
     {
         return $this->client->sendAsync($this, $this->options);
     }
-
 }

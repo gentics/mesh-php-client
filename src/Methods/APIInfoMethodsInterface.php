@@ -20,5 +20,4 @@ interface APIInfoMethodsInterface
      * @return
      */
     public function getRAML(): MeshRequest;
-
 }

@@ -20,7 +20,7 @@ class MeshResponse implements ResponseInterface
 
     /**
      * Convert the response body to a json object.
-     * 
+     *
      * @return mixed
      */
     public function toJson()
@@ -30,7 +30,7 @@ class MeshResponse implements ResponseInterface
 
     /**
      * Check whether the response is returning json by inspecting the response header.
-     * 
+     *
      * @return bool
      */
     public function isJson()
@@ -115,5 +115,4 @@ class MeshResponse implements ResponseInterface
     {
         $this->response->withBody($body);
     }
-
 }

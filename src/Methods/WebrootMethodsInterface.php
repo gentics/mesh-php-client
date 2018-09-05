@@ -16,5 +16,4 @@ interface WebrootMethodsInterface
      * @return MeshRequest
      */
     public function webroot(string $projectName, string $path, array $parameters = []): MeshRequest;
-
 }

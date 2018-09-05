@@ -71,5 +71,4 @@ interface TagMethodsInterface
      * @return
      */
     public function findTags(string $projectName, string $tagFamilyUuid, array $parameters = []): MeshRequest;
-
 }

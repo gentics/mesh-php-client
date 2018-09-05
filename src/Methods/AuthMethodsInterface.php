@@ -23,5 +23,4 @@ interface AuthMethodsInterface
      * @return
      */
     public function me(): MeshRequest;
-
 }

@@ -110,5 +110,4 @@ interface UsersMethodsInterface
      * @return
      */
     public function invalidateAPIToken(string $userUuid): MeshRequest;
-
 }

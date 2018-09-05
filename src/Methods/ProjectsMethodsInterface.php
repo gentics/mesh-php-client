@@ -86,5 +86,4 @@ interface ProjectsMethodsInterface
      * @return
      */
     public function deleteProject(string $uuid): MeshRequest;
-
 }

@@ -47,5 +47,4 @@ interface AdminMethodsInterface
      * @return
      */
     public function repairConsistency(): MeshRequest;
-
 }

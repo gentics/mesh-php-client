@@ -30,7 +30,6 @@ Methods\TagMethodsInterface,
 Methods\UtilityMethodsInterface,
 Methods\WebrootMethodsInterface
 {
-
     private $baseUri;
 
     private $cookieJar;
@@ -176,8 +175,12 @@ Methods\WebrootMethodsInterface
         return $this->buildRequest("GET", "/" . $this->encodeSegment($projectName) . "/nodes/" . $nodeUuid . "/published", null, $parameters);
     }
 
-    public function getNodeLanguagePublishStatus(string $projectName, string $nodeUuid, string $languageTag,
-        array $parameters = []): MeshRequest {
+    public function getNodeLanguagePublishStatus(
+        string $projectName,
+        string $nodeUuid,
+        string $languageTag,
+        array $parameters = []
+    ): MeshRequest {
         return $this->buildRequest("GET", "/" . $this->encodeSegment($projectName) . "/nodes/" . $nodeUuid . "/published", null, $parameters);
     }
 
@@ -619,10 +622,10 @@ Methods\WebrootMethodsInterface
 
     public function login(string $username, string $password): Promise
     {
-        $request = array(
+        $request = [
             "username" => $username,
             "password" => $password,
-        );
+        ];
 
         return $this->buildRequest("POST", "/auth/login", $request)->sendAsync()->then(function ($r) {
             $json = json_decode($r->getBody(), true);
@@ -677,8 +680,11 @@ Methods\WebrootMethodsInterface
         return $this->buildRequest("GET", "/" . $this->encodeSegment($projectName) . "/branches/" . $branchUuid . "/microschemas");
     }
 
-    public function assignBranchMicroschemaVersions(string $projectName, string $branchUuid,
-        $microschemaVersionReferences): MeshRequest {
+    public function assignBranchMicroschemaVersions(
+        string $projectName,
+        string $branchUuid,
+        $microschemaVersionReferences
+    ): MeshRequest {
         return $this->buildRequest("POST", "/" . $this->encodeSegment($projectName) . "/branches/" . $branchUuid . "/microschemas", $microschemaVersionReferences);
     }
 
@@ -837,9 +843,17 @@ Methods\WebrootMethodsInterface
 
     // Binary Field Methods
 
-    public function updateNodeBinaryField(string $projectName, string $nodeUuid, string $languageTag, string $nodeVersion,
-        string $fieldKey, $fileData, string $fileName, string $contentType, array $parameters = []): MeshRequest {
-
+    public function updateNodeBinaryField(
+        string $projectName,
+        string $nodeUuid,
+        string $languageTag,
+        string $nodeVersion,
+        string $fieldKey,
+        $fileData,
+        string $fileName,
+        string $contentType,
+        array $parameters = []
+    ): MeshRequest {
         throw new Rest\NotImplementedException();
 
         return $client->request('POST', $this->baseUri . "/" . $this->encodeSegment($projectName) . "/nodes/" . $nodeUuid . "/binary/" . $fieldName, [
@@ -862,22 +876,36 @@ Methods\WebrootMethodsInterface
                 ],
             ],
         ]);
-
     }
 
-    public function downloadBinaryField(string $projectName, string $nodeUuid, string $languageTag, string $fieldKey,
-        array $parameters = []): MeshRequest {
+    public function downloadBinaryField(
+        string $projectName,
+        string $nodeUuid,
+        string $languageTag,
+        string $fieldKey,
+        array $parameters = []
+    ): MeshRequest {
         throw new Rest\NotImplementedException();
         return $client->request('GET', $this->baseUri . "/" . $this->encodeSegment($projectName) . "/nodes/" . $nodeUuid . "/binary/" . $fieldKey);
     }
 
-    public function transformNodeBinaryField(string $projectName, string $nodeUuid, string $languageTag, string $version,
-        string $fieldKey, $imageManipulationParameter): MeshRequest {
+    public function transformNodeBinaryField(
+        string $projectName,
+        string $nodeUuid,
+        string $languageTag,
+        string $version,
+        string $fieldKey,
+        $imageManipulationParameter
+    ): MeshRequest {
         throw new Rest\NotImplementedException();
         // TODO prepare the request.
         $request = [];
-        return $this->buildRequest("POST", "/" . $this->encodeSegment($projectName) . "/nodes/" . $nodeUuid . "/binaryTransform/" . $fieldKey, array($imageManipulationParameter),
-            $request);
+        return $this->buildRequest(
+            "POST",
+            "/" . $this->encodeSegment($projectName) . "/nodes/" . $nodeUuid . "/binaryTransform/" . $fieldKey,
+            [$imageManipulationParameter],
+            $request
+        );
     }
 
     // Utility Methods

@@ -146,5 +146,4 @@ interface SchemaMethodsInterface
      * @return
      */
     public function findProjectMicroschemas(string $projectName, array $parameters = []): MeshRequest;
-
 }

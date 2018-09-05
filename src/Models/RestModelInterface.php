@@ -2,7 +2,6 @@
 
 namespace Gentics\Mesh\Client;
 
-interface RestModelInterface {
-
-    
+interface RestModelInterface
+{
 }
