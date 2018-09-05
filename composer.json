@@ -23,50 +23,56 @@
 		"guzzlehttp/guzzle": "^6.0"
 	},
 	"require-dev": {
+		"brainmaestro/composer-git-hooks": "dev-master",
 		"friendsofphp/php-cs-fixer": "^2.13@dev",
-		"javihgil/composer-ci-tools": "~1.0",
+		"overtrue/phplint": "dev-master",
 		"phpunit/phpunit": "^6",
 		"sensiolabs/security-checker": "^5.0@dev",
 		"squizlabs/php_codesniffer": "^3.0@dev"
 	},
 	"extra" : {
-		"ci-tools": {
-			"global": {
-				"log-format": "  <fg=cyan>> %s</>"
-			},
-			"lint": {
-				"php-include": [ "src/" ]
-			},	
-			"phpcsfixer": {
-				"dry-run": true
-			}
-		}
+        "hooks": {
+            "pre-commit": "composer pre-commit"
+        }
 	},
 	"config": {
 		"sort-packages": true
 	},
 	"minimum-stability": "dev",
 	"scripts": {
-		"post-install-cmd": [
-			"Jhg\\ComposerCiTools\\GitHooksInstaller::preCommit"
-		],
-		"pre-commit-hook": [
+        "post-install-cmd": "./vendor/bin/cghooks add --ignore-lock",
+        "post-update-cmd": "./vendor/bin/cghooks update",
+		"pre-commit": [
 			"@test"
 		],
 		"lint": [
-			"Jhg\\ComposerCiTools\\Lint::phpLazy"
+			"phplint src/",
+			"php-cs-fixer fix --dry-run --verbose",
+			"phpcs"
 		],
 		"securitycheck": [
-			"Jhg\\ComposerCiTools\\SecurityChecker::check"
+			"security-checker security:check composer.lock"
+		],
+		"phpunit": [
+			"phpunit src/"
 		],
 		"test": [
 			"@composer validate",
-			"Jhg\\ComposerCiTools\\PhpCsFixer::fix",
-			"Jhg\\ComposerCiTools\\PhpUnit::test",
+			"@lint",
+			"@phpunit",
 			"@securitycheck"
 		],
-		"fix": [
-			"./vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix"
+		"fixcode": [
+			"php-cs-fixer fix"
+		],
+		"build": [
+			"@composer install",
+			"mkdir -p .reports",
+			"./vendor/bin/phplint src/",
+			"./vendor/bin/php-cs-fixer fix --dry-run --format=junit > .reports/php-cs-fixer.xml || true",
+			"./vendor/bin/phpcs --report=junit --report-file=.reports/phpcs.xml src/ || true",
+			"./vendor/bin/phpunit --log-junit=.reports/phpunit.xml src/ || true",
+			"./vendor/bin/security-checker security:check composer.lock"
 		]
 	}
 }
