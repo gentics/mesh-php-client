@@ -51,15 +51,7 @@ spec:
 			steps {
 				githubBuildStarted()
 
-				script {
-					// 0 = OK, 1 = UNSTABLE, 2 = ERROR
-					def statusCode = sh script: "./ci/build.sh", returnStatus: true
-					if (statusCode == 1) {
-						currentBuild.result = 'UNSTABLE'
-					} else if (statusCode > 1) {
-						currentBuild.result = 'FAILURE'
-					}
-				}
+				sh "composer build"
 			}
 
 			post {

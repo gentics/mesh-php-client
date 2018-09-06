@@ -48,7 +48,7 @@
 		"lint": [
 			"phplint src/",
 			"php-cs-fixer fix --dry-run --verbose",
-			"phpcs"
+			"phpcs src/"
 		],
 		"securitycheck": [
 			"security-checker security:check composer.lock"
