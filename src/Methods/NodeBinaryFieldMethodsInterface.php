@@ -31,12 +31,12 @@ interface NodeBinaryFieldMethodsInterface
         string $nodeUuid,
         string $languageTag,
         string $nodeVersion,
-            string $fieldKey,
+        string $fieldKey,
         $fileData,
         string $fileName,
         string $contentType,
         array $parameters = []
-    ):MeshRequest;
+    ) : MeshRequest;
 
     /**
      * Download the binary field of the given node in the given project.
@@ -53,8 +53,8 @@ interface NodeBinaryFieldMethodsInterface
         string $nodeUuid,
         string $languageTag,
         string $fieldKey,
-    array $parameters = []
-    ):MeshRequest;
+        array $parameters = []
+    ) : MeshRequest;
 
     /**
      * Transform the binary field of the given node in the given project
@@ -78,7 +78,7 @@ interface NodeBinaryFieldMethodsInterface
         string $nodeUuid,
         string $languageTag,
         string $version,
-            string $fieldKey,
+        string $fieldKey,
         $imageManipulationParameter
-    ):MeshRequest;
+    ) : MeshRequest;
 }

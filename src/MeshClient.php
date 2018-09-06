@@ -9,26 +9,26 @@ use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Promise\Promise;
 
 class MeshClient extends HttpClient implements
-Methods\UsersMethodsInterface,
-Methods\AdminMethodsInterface,
-Methods\AdminPluginMethodsInterface,
-Methods\APIInfoMethodsInterface,
-Methods\AuthMethodsInterface,
-Methods\BranchMethodsInterface,
-Methods\GraphQLMethodsInterface,
-Methods\GroupsMethodsInterface,
-Methods\JobMethodsInterface,
-Methods\NodeBinaryFieldMethodsInterface,
-Methods\NodesMethodsInterface,
-Methods\ProjectsMethodsInterface,
-Methods\RolesMethodsInterface,
-Methods\SchemaMethodsInterface,
-Methods\MicroschemaMethodsInterface,
-Methods\SearchMethodsInterface,
-Methods\TagFamiliesMethodsInterface,
-Methods\TagMethodsInterface,
-Methods\UtilityMethodsInterface,
-Methods\WebrootMethodsInterface
+    Methods\UsersMethodsInterface,
+    Methods\AdminMethodsInterface,
+    Methods\AdminPluginMethodsInterface,
+    Methods\APIInfoMethodsInterface,
+    Methods\AuthMethodsInterface,
+    Methods\BranchMethodsInterface,
+    Methods\GraphQLMethodsInterface,
+    Methods\GroupsMethodsInterface,
+    Methods\JobMethodsInterface,
+    Methods\NodeBinaryFieldMethodsInterface,
+    Methods\NodesMethodsInterface,
+    Methods\ProjectsMethodsInterface,
+    Methods\RolesMethodsInterface,
+    Methods\SchemaMethodsInterface,
+    Methods\MicroschemaMethodsInterface,
+    Methods\SearchMethodsInterface,
+    Methods\TagFamiliesMethodsInterface,
+    Methods\TagMethodsInterface,
+    Methods\UtilityMethodsInterface,
+    Methods\WebrootMethodsInterface
 {
     private $baseUri;
 

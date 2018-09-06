@@ -36,10 +36,10 @@ class MeshResponse implements ResponseInterface
     public function isJson()
     {
         $type = $this->getHeader("content-type")[0];
-        return $this->has_prefix($type, "application/json");
+        return $this->hasPrefix($type, "application/json");
     }
 
-    private function has_prefix($string, $prefix)
+    private function hasPrefix($string, $prefix)
     {
         return ((substr($string, 0, strlen($prefix)) == $prefix) ? true : false);
     }
