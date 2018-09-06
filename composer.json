@@ -70,7 +70,7 @@
 			"mkdir -p .reports",
 			"./vendor/bin/phplint src/",
 			"./vendor/bin/php-cs-fixer fix --dry-run --format=junit > .reports/php-cs-fixer.xml || true",
-			"./vendor/bin/phpcs --report=junit --report-file=.reports/phpcs.xml src/ || true",
+			"./vendor/bin/phpcs --warning-severity=6 --report=junit --report-file=.reports/phpcs.xml src/ || true",
 			"./vendor/bin/phpunit --log-junit=.reports/phpunit.xml src/ || true",
 			"./vendor/bin/security-checker security:check composer.lock"
 		]
