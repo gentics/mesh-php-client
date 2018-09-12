@@ -21,11 +21,21 @@ class MeshResponse implements ResponseInterface
     /**
      * Convert the response body to a json object.
      *
-     * @return mixed
+     * @return \stdClass
      */
     public function toJson()
     {
         return json_decode($this->response->getBody());
+    }
+
+    /**
+     * Convert the response body to an array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return json_decode($this->response->getBody(), true);
     }
 
     /**
