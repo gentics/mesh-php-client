@@ -30,6 +30,8 @@ class MeshClient extends HttpClient implements
     Methods\UtilityMethodsInterface,
     Methods\WebrootMethodsInterface
 {
+    const API_VERSION = 1;
+
     private $baseUri;
 
     private $cookieJar;
@@ -39,9 +41,18 @@ class MeshClient extends HttpClient implements
      */
     private $token;
 
-    public function __construct(string $baseUri = "http://localhost:8080/api/v1", array $config = [])
+    /**
+     * MeshClient constructor.
+     * @param string $baseUri The base URL of the Mesh server without trailing / and without /api/v?
+     * @param array $config Additional configuration options
+     */
+    public function __construct(string $baseUri = "http://localhost:8080", array $config = [])
     {
         $this->baseUri = $baseUri;
+        if (strstr($baseUri, '/api/') === false) {
+            $this->baseUri .= '/api/v' . self::API_VERSION;
+        }
+
         $this->cookieJar = new CookieJar();
         $config["cookies"] = $this->cookieJar;
         parent::__construct($config);
