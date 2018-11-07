@@ -32,6 +32,8 @@ spec:
     - mountPath: /home/jenkins/.composer/cache
       name: cache
       subPath: composer/cache
+  imagePullSecrets:
+  - name: docker-jenkinsbuilds-apa-it
 """
 		}
 	}
