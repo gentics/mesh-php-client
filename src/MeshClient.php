@@ -3,7 +3,6 @@
 namespace Gentics\Mesh\Client;
 
 use Gentics\Mesh\Client\Rest\MeshRequest;
-use Gentics\Mesh\Client\Rest\Request;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Promise\Promise;
@@ -63,21 +62,22 @@ class MeshClient extends HttpClient implements
      *
      * @param $method
      * @param $uri
-     * @param mixed $body
-     * @param array $options
-     * @return RequestInterface
+     * @param null $body
+     * @param array $parameters
+     * @param string $requestClass
+     * @return MeshRequest
      */
     final protected function buildRequest($method, $uri, $body = null, array $parameters = [], $requestClass = 'MeshRequest')
     {
+        $options = [];
         $headers = isset($options['headers']) ? $options['headers'] : [];
-        $requestClass = '\\Gentics\Mesh\Client\\Rest\\' . $requestClass;
+        $requestClass = '\\Gentics\\Mesh\\Client\\Rest\\' . $requestClass;
         //$request = new $requestClass($method, $this->baseUri . $uri, $headers, $body);
         if (isset($this->token)) {
             $headers["Authorization"] = "Bearer " . $this->token;
         }
         $options["query"] = $parameters;
-        $request = new \Gentics\Mesh\Client\Rest\MeshRequest($this, $method, $this->baseUri . $uri, $headers, $body, $options);
-
+        $request = new MeshRequest($this, $method, $this->baseUri . $uri, $headers, $body, $options);
         return $request;
     }
 
@@ -91,9 +91,9 @@ class MeshClient extends HttpClient implements
 
     // Node Methods
 
-    public function findNodeByUuid(string $projectName, string $uuid, array $parameters = []): MeshRequest
+    public function findNodeByUuid(string $projectName, string $nodeUuid, array $parameters = []): MeshRequest
     {
-        return $this->buildRequest("GET", "/" . $this->encodeSegment($projectName) . "/nodes/" . $uuid);
+        return $this->buildRequest("GET", "/" . $this->encodeSegment($projectName) . "/nodes/" . $nodeUuid);
     }
 
     public function findNodes(string $projectName, array $parameters = []): MeshRequest
@@ -131,9 +131,9 @@ class MeshClient extends HttpClient implements
         return $this->buildRequest("POST", "/" . $this->encodeSegment($projectName) . "/nodes/" . $nodeUuid . "/tags", $request, $parameters);
     }
 
-    public function updateNode(string $projectName, string $uuid, $nodeUpdateRequest, array $parameters = []): MeshRequest
+    public function updateNode(string $projectName, string $nodeUuid, $nodeUpdateRequest, array $parameters = []): MeshRequest
     {
-        return $this->buildRequest("POST", "/" . $this->encodeSegment($projectName) . "/nodes/" . $uuid, $nodeUpdateRequest, $parameters);
+        return $this->buildRequest("POST", "/" . $this->encodeSegment($projectName) . "/nodes/" . $nodeUuid, $nodeUpdateRequest, $parameters);
     }
 
     public function moveNode(string $projectName, string $nodeUuid, string $targetFolderUuid, array $parameters = []): MeshRequest
@@ -141,14 +141,14 @@ class MeshClient extends HttpClient implements
         return $this->buildRequest("POST", "/" . $this->encodeSegment($projectName) . "/nodes/" . $nodeUuid . "/moveTo/" . $targetFolderUuid, null, $parameters);
     }
 
-    public function deleteNode(string $projectName, string $uuid, array $parameters = []): MeshRequest
+    public function deleteNode(string $projectName, string $nodeUuid, array $parameters = []): MeshRequest
     {
-        return $this->buildRequest("DELETE", "/" . $this->encodeSegment($projectName) . "/nodes/" . $uuid, null, $parameters);
+        return $this->buildRequest("DELETE", "/" . $this->encodeSegment($projectName) . "/nodes/" . $nodeUuid, null, $parameters);
     }
 
-    public function deleteNodeLanguage(string $projectName, string $uuid, string $language, array $parameters = []): MeshRequest
+    public function deleteNodeLanguage(string $projectName, string $nodeUuid, string $languageTag, array $parameters = []): MeshRequest
     {
-        return $this->buildRequest("DELETE", "/" . $this->encodeSegment($projectName) . "/nodes/" . $uuid . "/languages/" . $languageTag, null, $parameters);
+        return $this->buildRequest("DELETE", "/" . $this->encodeSegment($projectName) . "/nodes/" . $nodeUuid . "/languages/" . $languageTag, null, $parameters);
     }
 
     public function createNode(string $projectName, $request, array $parameters = []): MeshRequest
@@ -161,7 +161,7 @@ class MeshClient extends HttpClient implements
         return $this->buildRequest("POST", "/" . $this->encodeSegment($projectName) . "/nodes/" . $uuid, $request, $parameters);
     }
 
-    public function publishNode(string $projectName, string $uuid, array $parameters = []): MeshRequest
+    public function publishNode(string $projectName, string $nodeUuid, array $parameters = []): MeshRequest
     {
         return $this->buildRequest("POST", "/" . $this->encodeSegment($projectName) . "/nodes/" . $nodeUuid . "/published", null, $parameters);
     }
@@ -231,7 +231,7 @@ class MeshClient extends HttpClient implements
 
     public function findTagFamilies(string $projectName, array $parameters = []): MeshRequest
     {
-        return $this->buildRequest("GET", "/" . $this->encodeSegment($projectName) . "/tagFamilies", null, $pagingInfo);
+        return $this->buildRequest("GET", "/" . $this->encodeSegment($projectName) . "/tagFamilies");
     }
 
     public function createTagFamily(string $projectName, $request): MeshRequest
@@ -308,9 +308,9 @@ class MeshClient extends HttpClient implements
         return $this->buildRequest("POST", "/users/" . $uuid, $request, $parameters);
     }
 
-    public function deleteUser(string $uuid)
+    public function deleteUser(string $uuid): MeshRequest
     {
-        return $this->buildRequest("DELETE", "/users/" . $uuid, null);
+        return $this->buildRequest("DELETE", "/users/" . $uuid);
     }
 
     public function findUsersOfGroup(string $groupUuid, array $parameters = []): MeshRequest
@@ -320,7 +320,7 @@ class MeshClient extends HttpClient implements
 
     public function readUserPermissions(string $uuid, string $pathToElement): MeshRequest
     {
-        return $this->buildRequest("GET", "/users/" . $uuid . "/permissions/" . $pathToElement, null);
+        return $this->buildRequest("GET", "/users/" . $uuid . "/permissions/" . $pathToElement);
     }
 
     public function getUserResetToken(string $userUuid): MeshRequest
@@ -342,7 +342,7 @@ class MeshClient extends HttpClient implements
 
     public function findGroupByUuid(string $uuid): MeshRequest
     {
-        return $this->buildRequest("GET", "/groups/" . $uuid, null, $parameters);
+        return $this->buildRequest("GET", "/groups/" . $uuid);
     }
 
     public function findGroups(array $parameters = []): MeshRequest
@@ -380,12 +380,12 @@ class MeshClient extends HttpClient implements
         return $this->buildRequest("DELETE", "/groups/" . $groupUuid . "/users/" . $userUuid);
     }
 
-    public function addRoleToGroup(string $groupUuid, string $roleUuid)
+    public function addRoleToGroup(string $groupUuid, string $roleUuid): MeshRequest
     {
         return $this->buildRequest("POST", "/groups/" . $groupUuid . "/roles/" . $roleUuid);
     }
 
-    public function removeRoleFromGroup(string $groupUuid, string $roleUuid)
+    public function removeRoleFromGroup(string $groupUuid, string $roleUuid): MeshRequest
     {
         return $this->buildRequest("DELETE", "/groups/" . $groupUuid . "/roles/" . $roleUuid);
     }
@@ -394,122 +394,122 @@ class MeshClient extends HttpClient implements
 
     public function searchNodes(string $query, array $parameters = []): MeshRequest
     {
-        return handleRequest("POST", "/search/nodes", $query, $parameters);
+        return $this->buildRequest("POST", "/search/nodes", $query, $parameters);
     }
 
-    public function searchNodesRaw(string $query, array $parameters = []): MeshRequest
+    public function searchNodesRaw(array $query, array $parameters = []): MeshRequest
     {
-        return handleRequest("POST", "/rawSearch/nodes", $query, $parameters);
+        return $this->buildRequest("POST", "/rawSearch/nodes", $query, $parameters);
     }
 
-    public function searchProjectNodes(string $project, string $query, array $parameters = []): MeshRequest
+    public function searchProjectNodes(string $projectName, string $query, array $parameters = []): MeshRequest
     {
-        return handleRequest("POST", "/" . $this->encodeSegment($projectName) . "/search/nodes", $query, $parameters);
+        return $this->buildRequest("POST", "/" . $this->encodeSegment($projectName) . "/search/nodes", $query, $parameters);
     }
 
-    public function searchProjectNodesRaw(string $project, string $query, array $parameters = []): MeshRequest
+    public function searchProjectNodesRaw(string $projectName, array $query, array $parameters = []): MeshRequest
     {
-        return handleRequest("POST", "/" . $this->encodeSegment($projectName) . "/rawSearch/nodes", $query, $parameters);
+        return $this->buildRequest("POST", "/" . $this->encodeSegment($projectName) . "/rawSearch/nodes", $query, $parameters);
     }
 
     public function searchUsers(string $query, array $parameters = []): MeshRequest
     {
-        return handleRequest("POST", "/search/users", $query, $parameters);
+        return $this->buildRequest("POST", "/search/users", $query, $parameters);
     }
 
     public function searchUsersRaw(string $query, array $parameters = []): MeshRequest
     {
-        return handleRequest("POST", "/rawSearch/users", $query, $parameters);
+        return $this->buildRequest("POST", "/rawSearch/users", $query, $parameters);
     }
 
     public function searchRoles(string $query, array $parameters = []): MeshRequest
     {
-        return handleRequest("POST", "/search/roles", $query, $parameters);
+        return $this->buildRequest("POST", "/search/roles", $query, $parameters);
     }
 
     public function searchRolesRaw(string $query, array $parameters = []): MeshRequest
     {
-        return handleRequest("POST", "/rawSearch/roles", $query, $parameters);
+        return $this->buildRequest("POST", "/rawSearch/roles", $query, $parameters);
     }
 
     public function searchGroups(string $query, array $parameters = []): MeshRequest
     {
-        return handleRequest("POST", "/search/groups", $query, $parameters);
+        return $this->buildRequest("POST", "/search/groups", $query, $parameters);
     }
 
     public function searchGroupsRaw(string $query, array $parameters = []): MeshRequest
     {
-        return handleRequest("POST", "/rawSearch/groups", $query, $parameters);
+        return $this->buildRequest("POST", "/rawSearch/groups", $query, $parameters);
     }
 
     public function searchTagFamilies(string $query, array $parameters = []): MeshRequest
     {
-        return handleRequest("POST", "/search/tagFamilies", $query, $parameters);
+        return $this->buildRequest("POST", "/search/tagFamilies", $query, $parameters);
     }
 
     public function searchTagFamiliesRaw(string $query, array $parameters = []): MeshRequest
     {
-        return handleRequest("POST", "/rawSearch/tagFamilies", $query, $parameters);
+        return $this->buildRequest("POST", "/rawSearch/tagFamilies", $query, $parameters);
     }
 
-    public function searchProjectTagFamilies(string $projectName, string $json, array $parameters = []): MeshRequest
+    public function searchProjectTagFamilies(string $projectName, string $query, array $parameters = []): MeshRequest
     {
-        return handleRequest("POST", "/" . $this->encodeSegment($projectName) . "/search/tagFamilies", $query, $parameters);
+        return $this->buildRequest("POST", "/" . $this->encodeSegment($projectName) . "/search/tagFamilies", $query, $parameters);
     }
 
-    public function searchProjectTagFamiliesRaw(string $projectName, string $json): MeshRequest
+    public function searchProjectTagFamiliesRaw(string $projectName, string $query): MeshRequest
     {
-        return handleRequest("POST", "/" . $this->encodeSegment($projectName) . "/rawSearch/tagFamilies", $query, $parameters);
+        return $this->buildRequest("POST", "/" . $this->encodeSegment($projectName) . "/rawSearch/tagFamilies", $query);
     }
 
     public function searchSchemas(string $query, array $parameters = []): MeshRequest
     {
-        return handleRequest("POST", "/search/schemas", $query, $parameters);
+        return $this->buildRequest("POST", "/search/schemas", $query, $parameters);
     }
 
     public function searchSchemasRaw(string $query, array $parameters = []): MeshRequest
     {
-        return handleRequest("POST", "/rawSearch/schemas", $query, $parameters);
+        return $this->buildRequest("POST", "/rawSearch/schemas", $query, $parameters);
     }
 
-    public function searchProjects(string $json, array $parameters = []): MeshRequest
+    public function searchProjects(string $query, array $parameters = []): MeshRequest
     {
-        return handleRequest("POST", "/search/projects", $query, $parameters);
+        return $this->buildRequest("POST", "/search/projects", $query, $parameters);
     }
 
-    public function searchProjectsRaw(string $json): MeshRequest
+    public function searchProjectsRaw(string $query): MeshRequest
     {
-        return handleRequest("POST", "/rawSearch/projects", $query, $parameters);
+        return $this->buildRequest("POST", "/rawSearch/projects". $query);
     }
 
-    public function searchTags(string $json, array $parameters = []): MeshRequest
+    public function searchTags(string $query, array $parameters = []): MeshRequest
     {
-        return handleRequest("POST", "/search/tags", $query, $parameters);
+        return $this->buildRequest("POST", "/search/tags", $query, $parameters);
     }
 
-    public function searchTagsRaw(string $json): MeshRequest
+    public function searchTagsRaw(string $query): MeshRequest
     {
-        return handleRequest("POST", "/rawSearch/tags", $query, $parameters);
+        return $this->buildRequest("POST", "/rawSearch/tags", $query);
     }
 
-    public function searchProjectTags(string $projectName, string $json, array $parameters = []): MeshRequest
+    public function searchProjectTags(string $projectName, string $query, array $parameters = []): MeshRequest
     {
-        return handleRequest("POST", "/" . $this->encodeSegment($projectName) . "/search/tags", $query, $parameters);
+        return $this->buildRequest("POST", "/" . $this->encodeSegment($projectName) . "/search/tags", $query, $parameters);
     }
 
-    public function searchProjectTagsRaw(string $projectName, string $json): MeshRequest
+    public function searchProjectTagsRaw(string $projectName, string $query): MeshRequest
     {
-        return handleRequest("POST", "/" . $this->encodeSegment($projectName) . "/rawSearch/tags", $query, $parameters);
+        return $this->buildRequest("POST", "/" . $this->encodeSegment($projectName) . "/rawSearch/tags", $query);
     }
 
     public function searchMicroschemas(string $query, array $parameters = []): MeshRequest
     {
-        return handleRequest("POST", "/search/microschemas", $query, $parameters);
+        return $this->buildRequest("POST", "/search/microschemas", $query, $parameters);
     }
 
     public function searchMicroschemasRaw(string $query): MeshRequest
     {
-        return handleRequest("POST", "/rawSearch/microschemas", $query, $parameters);
+        return $this->buildRequest("POST", "/rawSearch/microschemas", $query);
     }
 
     public function invokeIndexClear(): MeshRequest
@@ -531,12 +531,12 @@ class MeshClient extends HttpClient implements
 
     public function findProjectByUuid(string $uuid, array $parameters = []): MeshRequest
     {
-        return prepareRequest(GET, "/projects/" . $uuid, null, $parameters);
+        return $this->buildRequest('GET', "/projects/" . $uuid, null, $parameters);
     }
 
     public function findProjectByName(string $name, array $parameters = []): MeshRequest
     {
-        return prepareRequest(GET, "/" . $this->encodeSegment($name), null, $parameters);
+        return $this->buildRequest('GET', "/" . $this->encodeSegment($name), null, $parameters);
     }
 
     public function findProjects(array $parameters = []): MeshRequest
@@ -867,7 +867,7 @@ class MeshClient extends HttpClient implements
     ): MeshRequest {
         throw new Rest\NotImplementedException();
 
-        return $client->request('POST', $this->baseUri . "/" . $this->encodeSegment($projectName) . "/nodes/" . $nodeUuid . "/binary/" . $fieldName, [
+        /*return $client->request('POST', $this->baseUri . "/" . $this->encodeSegment($projectName) . "/nodes/" . $nodeUuid . "/binary/" . $fieldName, [
             'multipart' => [
                 [
                     'name' => 'version',
@@ -886,7 +886,7 @@ class MeshClient extends HttpClient implements
                     ],
                 ],
             ],
-        ]);
+        ]);*/
     }
 
     public function downloadBinaryField(
@@ -897,7 +897,7 @@ class MeshClient extends HttpClient implements
         array $parameters = []
     ): MeshRequest {
         throw new Rest\NotImplementedException();
-        return $client->request('GET', $this->baseUri . "/" . $this->encodeSegment($projectName) . "/nodes/" . $nodeUuid . "/binary/" . $fieldKey);
+        // return $client->request('GET', $this->baseUri . "/" . $this->encodeSegment($projectName) . "/nodes/" . $nodeUuid . "/binary/" . $fieldKey);
     }
 
     public function transformNodeBinaryField(
@@ -910,20 +910,20 @@ class MeshClient extends HttpClient implements
     ): MeshRequest {
         throw new Rest\NotImplementedException();
         // TODO prepare the request.
-        $request = [];
+        /*$request = [];
         return $this->buildRequest(
             "POST",
             "/" . $this->encodeSegment($projectName) . "/nodes/" . $nodeUuid . "/binaryTransform/" . $fieldKey,
             [$imageManipulationParameter],
             $request
-        );
+        );*/
     }
 
     // Utility Methods
 
     public function resolveLinks(string $body, array $parameters = []): MeshRequest
     {
-        return handleRequest("POST", "/utilities/linkResolver", $body, $parameters);
+        return $this->buildRequest("POST", "/utilities/linkResolver", $body, $parameters);
     }
 
     public function validateSchema($schema): MeshRequest
@@ -933,7 +933,7 @@ class MeshClient extends HttpClient implements
 
     public function validateMicroschema($microschema): MeshRequest
     {
-        return $this->buildRequest("POST", "/utilities/validateMicroschema", $schema);
+        return $this->buildRequest("POST", "/utilities/validateMicroschema", $microschema);
     }
 
     // Webroot Methods

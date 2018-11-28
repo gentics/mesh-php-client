@@ -24,7 +24,7 @@ interface SearchMethodsInterface
      * @param parameters
      * @return
      */
-    public function searchNodesRaw(string $json, array $parameters = []): MeshRequest;
+    public function searchNodesRaw(array $query, array $parameters = []): MeshRequest;
 
     /**
      * Search for nodes in the project.
@@ -41,12 +41,12 @@ interface SearchMethodsInterface
     /**
      * Search for nodes in the project and return the raw response of the search engine.
      *
-     * @param projectName
-     * @param json
-     * @param parameters
-     * @return
+     * @param string $projectName
+     * @param array $query
+     * @param array $parameters
+     * @return MeshRequest
      */
-    public function searchProjectNodesRaw(string $projectName, string $json, array $parameters = []): MeshRequest;
+    public function searchProjectNodesRaw(string $projectName, array $query, array $parameters = []): MeshRequest;
 
     /**
      * Search users.
