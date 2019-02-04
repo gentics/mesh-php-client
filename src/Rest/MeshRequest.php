@@ -33,6 +33,29 @@ class MeshRequest extends HttpRequest
         return new MeshResponse($response);
     }
 
+    /**
+     * Adds header to the request
+     * @param string $key
+     * @param string $value
+     */
+    public function addHeader(string $key, string $value)
+    {
+        if (!isset($this->options['headers'][$key])) {
+            $this->options['headers'][$key] = $value;
+        } else {
+            // TODO: Throw exception because header will be overwritten
+        }
+    }
+
+    /**
+     * Removes header from the request
+     * @param string $key
+     */
+    public function removeHeader(string $key)
+    {
+        unset($this->options['headers'][$key]);
+    }
+
     public function send()
     {
         return $this->wrapResponse($this->client->send($this, $this->options));
