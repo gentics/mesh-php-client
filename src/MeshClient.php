@@ -6,6 +6,10 @@ use Gentics\Mesh\Client\Rest\MeshRequest;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Promise\Promise;
+use Proxy\Proxy;
+use Proxy\Adapter\Guzzle\GuzzleAdapter;
+use Proxy\Filter\RemoveEncodingFilter;
+use Zend\Diactoros\ServerRequestFactory;
 
 class MeshClient extends HttpClient implements
     Methods\UsersMethodsInterface,
@@ -35,6 +39,8 @@ class MeshClient extends HttpClient implements
 
     private $cookieJar;
 
+    private $passedConfig = [];
+
     /**
      * JWT Token / API key to be used for authentication.
      */
@@ -47,6 +53,7 @@ class MeshClient extends HttpClient implements
      */
     public function __construct(string $baseUri = "http://localhost:8080", array $config = [])
     {
+        $this->passedConfig = $config;
         $this->baseUri = $baseUri;
         if (strstr($baseUri, '/api/') === false) {
             $this->baseUri .= '/api/v' . self::API_VERSION;
@@ -79,6 +86,44 @@ class MeshClient extends HttpClient implements
         $options["query"] = $parameters;
         $request = new MeshRequest($this, $method, $this->baseUri . $uri, $headers, $body, $options);
         return $request;
+    }
+
+    /**
+     * Proxy a request to Mesh
+     *
+     * @param $proxyPath
+     * @param array $filters
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public function proxy($proxyPath, $filters = [])
+    {
+        $request = ServerRequestFactory::fromGlobals();
+
+        // Use same config as the client
+        $guzzle = new HttpClient($this->passedConfig);
+
+        $proxy = new Proxy(new GuzzleAdapter($guzzle));
+
+        // Add Proxy headers
+        $proxy->filter(function ($request, $response, $next) {
+            $request = $request->withHeader('Via', '1.1 MeshPhpClient');
+            $response = $next($request, $response);
+            return $response;
+        });
+
+        if (is_callable($filters)) {
+            $proxy->filter($filters);
+        } else {
+            foreach ($filters as $filter) {
+                if (is_callable($filter)) {
+                    $proxy->filter($filter);
+                }
+            }
+        }
+
+        $response = $proxy->forward($request)->to($this->baseUri . $proxyPath);
+
+        return $response;
     }
 
     // Client API Methods

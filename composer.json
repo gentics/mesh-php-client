@@ -20,8 +20,9 @@
 	},
 	"require": {
 		"php": ">=7.0",
-        "ext-json": "*",
-		"guzzlehttp/guzzle": "^6.0"
+		"ext-json": "*",
+		"guzzlehttp/guzzle": "^6.0",
+		"jenssegers/proxy": "dev-master"
 	},
 	"require-dev": {
 		"brainmaestro/composer-git-hooks": "dev-master",
