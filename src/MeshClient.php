@@ -93,14 +93,16 @@ class MeshClient extends HttpClient implements
      *
      * @param $proxyPath
      * @param array $filters
+     * @param array $config
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function proxy($proxyPath, $filters = [])
+    public function proxy($proxyPath, $filters = [], $config = [])
     {
         $request = ServerRequestFactory::fromGlobals();
 
         // Use same config as the client
-        $guzzle = new HttpClient($this->passedConfig);
+        $guzzle = new HttpClient(array_merge($this->passedConfig, $config));
+        $proxy = new Proxy(new GuzzleAdapter($guzzle));
 
         $proxy = new Proxy(new GuzzleAdapter($guzzle));
 
@@ -125,6 +127,15 @@ class MeshClient extends HttpClient implements
 
         return $response;
     }
+
+    // Direct requestAsyc method
+    public function requestAsync($method, $uri = '', array $options = [])
+    {
+        if (!isset($options['base_uri'])) {
+            $options['base_uri'] = rtrim($this->baseUri, '/') . '/';
+        }
+        return parent::requestAsync($method, $uri, $options);
+    } 
 
     // Client API Methods
 
