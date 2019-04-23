@@ -63,7 +63,7 @@ class MeshResponse implements ResponseInterface
 
     public function withStatus($code, $reasonPhrase = '')
     {
-        $this->response->withStatus($code, $reasonPhrase);
+        return $this->response->withStatus($code, $reasonPhrase);
     }
 
     public function getReasonPhrase()
@@ -78,7 +78,7 @@ class MeshResponse implements ResponseInterface
 
     public function withProtocolVersion($version)
     {
-        $this->response->withProtocolVersion($version);
+        return $this->response->withProtocolVersion($version);
     }
 
     public function getHeaders()
@@ -103,17 +103,17 @@ class MeshResponse implements ResponseInterface
 
     public function withHeader($name, $value)
     {
-        $this->response->withHeader($name, $value);
+        return $this->response->withHeader($name, $value);
     }
 
     public function withAddedHeader($name, $value)
     {
-        $this->response->withAddedHeader($name, $value);
+        return $this->response->withAddedHeader($name, $value);
     }
 
     public function withoutHeader($name)
     {
-        $this->response->withoutHeader($name);
+        return $this->response->withoutHeader($name);
     }
 
     public function getBody()
@@ -123,6 +123,6 @@ class MeshResponse implements ResponseInterface
 
     public function withBody(StreamInterface $body)
     {
-        $this->response->withBody($body);
+        return $this->response->withBody($body);
     }
 }
