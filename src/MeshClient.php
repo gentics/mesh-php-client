@@ -104,8 +104,6 @@ class MeshClient extends HttpClient implements
         $guzzle = new HttpClient(array_merge($this->passedConfig, $config));
         $proxy = new Proxy(new GuzzleAdapter($guzzle));
 
-        $proxy = new Proxy(new GuzzleAdapter($guzzle));
-
         // Add Proxy headers
         $proxy->filter(function ($request, $response, $next) {
             $request = $request->withHeader('Via', '1.1 MeshPhpClient');
