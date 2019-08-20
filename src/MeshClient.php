@@ -133,7 +133,7 @@ class MeshClient extends HttpClient implements
             $options['base_uri'] = rtrim($this->baseUri, '/') . '/';
         }
         return parent::requestAsync($method, $uri, $options);
-    } 
+    }
 
     // Client API Methods
 
