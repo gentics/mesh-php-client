@@ -42,8 +42,8 @@
 	},
 	"minimum-stability": "dev",
 	"scripts": {
-        "post-install-cmd": "./vendor/bin/cghooks add --ignore-lock",
-        "post-update-cmd": "./vendor/bin/cghooks update",
+        "post-install-cmd": "sh ./vendor/bin/cghooks add --ignore-lock",
+        "post-update-cmd": "sh ./vendor/bin/cghooks update",
 		"pre-commit": [
 			"@test"
 		],
