@@ -8,7 +8,7 @@ use Gentics\Mesh\Client\MeshClient;
 use PHPUnit\Framework\TestCase;
 use \GuzzleHttp\Exception\ClientException;
 
-final class UserTest extends TestCase
+final class SchemaTest extends TestCase
 {
 
     public function testCrudSchema()
