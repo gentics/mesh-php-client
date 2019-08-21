@@ -41,6 +41,7 @@ final class SchemaTest extends TestCase
                      "required" => false,
                  ]
             ],
+
         ];
 
         // 1. Create
@@ -51,6 +52,7 @@ final class SchemaTest extends TestCase
         // 2. Reload
         $schema = $client->findSchemaByUuid($uuid)->send()->toJson();
         $this->assertEquals($name, $schema->name);
+
 
         // 3. Now update the Schema Name
         $schema->name = $newName;
@@ -78,7 +80,6 @@ final class SchemaTest extends TestCase
     
         $schema = $client->findSchemaByUuid($uuid)->send()->toJson();
         $this->assertEquals($newFieldData, end($schema->fields));
-        
         
         // 6. Now delete the schema
         $client->deleteSchema($uuid)->send();
