@@ -29,7 +29,7 @@ final class WebrootTest extends AbstractMeshTest
 
     public function testWebrootBinary() {
         $path = "/images/yacht-pelorus.jpg";
-        $client = new MeshClient("http://localhost:8888/api/v1");
+        $client = new MeshClient("http://localhost:8080/api/v1");
         $request = $client->webroot("demo", $path);
         // $request = $request->withAddedHeader('Accept', 'application/json');
         $response = $request->send();

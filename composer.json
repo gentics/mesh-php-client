@@ -56,7 +56,7 @@
 			"security-checker security:check composer.lock"
 		],
 		"phpunit": [
-			"phpunit src/"
+			"phpunit tests/"
 		],
 		"test": [
 			"@composer validate",
