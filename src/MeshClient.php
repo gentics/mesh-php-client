@@ -71,19 +71,20 @@ class MeshClient extends HttpClient implements
      * @param $uri
      * @param null $body
      * @param array $parameters
-     * @param string $requestClass
+     * @param boolean $stream
      * @return MeshRequest
      */
-    final protected function buildRequest($method, $uri, $body = null, array $parameters = [], $requestClass = 'MeshRequest')
+    final protected function buildRequest($method, $uri, $body = null, array $parameters = [], $stream = false)
     {
         $options = [];
         $headers = isset($options['headers']) ? $options['headers'] : [];
-        $requestClass = '\\Gentics\\Mesh\\Client\\Rest\\' . $requestClass;
+        $requestClass = MeshRequest::class;
         //$request = new $requestClass($method, $this->baseUri . $uri, $headers, $body);
         if (isset($this->token)) {
             $headers["Authorization"] = "Bearer " . $this->token;
         }
         $options["query"] = $parameters;
+        $options["stream"] = $stream;
         $request = new MeshRequest($this, $method, $this->baseUri . $uri, $headers, $body, $options);
         return $request;
     }
@@ -992,9 +993,9 @@ class MeshClient extends HttpClient implements
 
     // Webroot Methods
 
-    public function webroot(string $projectName, string $path, array $parameters = []): MeshRequest
+    public function webroot(string $projectName, string $path, array $parameters = [], $stream = false): MeshRequest
     {
-        return $this->buildRequest("GET", "/" . $this->encodeSegment($projectName) . "/webroot/" . $path, null, $parameters);
+        return $this->buildRequest("GET", "/" . $this->encodeSegment($projectName) . "/webroot/" . $path, null, $parameters, $stream);
     }
 
     private function encodeSegment(string $segment)
