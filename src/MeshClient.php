@@ -47,6 +47,11 @@ class MeshClient extends HttpClient implements
     private $token;
 
     /**
+     * Global Mesh Requests Timeout
+     */
+    private $meshTimeout = 0.0;
+
+    /**
      * MeshClient constructor.
      * @param string $baseUri The base URL of the Mesh server without trailing / and without /api/v?
      * @param array $config Additional configuration options
@@ -72,20 +77,29 @@ class MeshClient extends HttpClient implements
      * @param null $body
      * @param array $parameters
      * @param boolean $stream
+     * @param float $timeout
      * @return MeshRequest
      */
-    final protected function buildRequest($method, $uri, $body = null, array $parameters = [], $stream = false)
+    final protected function buildRequest($method, $uri, $body = null, array $parameters = [], $stream = false, $timeout = null)
     {
         $options = [];
         $headers = isset($options['headers']) ? $options['headers'] : [];
         $requestClass = MeshRequest::class;
-        //$request = new $requestClass($method, $this->baseUri . $uri, $headers, $body);
+
         if (isset($this->token)) {
             $headers["Authorization"] = "Bearer " . $this->token;
         }
+
+        if (is_null($timeout)) {
+            $timeout = $this->meshTimeout;
+        }
+
         $options["query"] = $parameters;
         $options["stream"] = $stream;
+        $options["timeout"] = $timeout;
+
         $request = new MeshRequest($this, $method, $this->baseUri . $uri, $headers, $body, $options);
+
         return $request;
     }
 
@@ -142,6 +156,11 @@ class MeshClient extends HttpClient implements
     {
         $this->cookieJar->clear();
         $this->token = $key;
+    }
+
+    public function setTimeout(float $timeout)
+    {
+        $this->meshTimeout = $timeout;
     }
 
     // Node Methods
@@ -682,6 +701,18 @@ class MeshClient extends HttpClient implements
     public function updateRole(string $uuid, $restRole): MeshRequest
     {
         return $this->buildRequest("POST", "/roles/" . $uuid, $restRole);
+    }
+
+    // Health Methods
+
+    public function healthLive(float $timeout = 10.0): MeshRequest
+    {
+        return $this->buildRequest("GET", "/health/live", null, [], false, $timeout);
+    }
+
+    public function healthReady(float $timeout = 10.0): MeshRequest
+    {
+        return $this->buildRequest("GET", "/health/ready", null , [], false, $timeout);
     }
 
     // Auth Methods
