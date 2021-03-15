@@ -167,7 +167,7 @@ class MeshClient extends HttpClient implements
 
     public function findNodeByUuid(string $projectName, string $nodeUuid, array $parameters = []): MeshRequest
     {
-        return $this->buildRequest("GET", "/" . $this->encodeSegment($projectName) . "/nodes/" . $nodeUuid);
+        return $this->buildRequest("GET", "/" . $this->encodeSegment($projectName) . "/nodes/" . $nodeUuid, null, $parameters);
     }
 
     public function findNodes(string $projectName, array $parameters = []): MeshRequest
