@@ -1029,6 +1029,12 @@ class MeshClient extends HttpClient implements
         return $this->buildRequest("GET", "/" . $this->encodeSegment($projectName) . "/webroot/" . $path, null, $parameters, $stream);
     }
 
+    public function webrootField(string $projectName, string $fieldName, string $path, array $parameters = [], $stream = false): MeshRequest
+    {
+        return $this->buildRequest("GET", "/" . $this->encodeSegment($projectName) . "/webrootfield/" . $fieldName . "/" . $path, null, $parameters, $stream);
+    }
+
+
     private function encodeSegment(string $segment)
     {
         // Encode segements RFC3986
