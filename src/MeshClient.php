@@ -6,10 +6,12 @@ use Gentics\Mesh\Client\Rest\MeshRequest;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Promise\Promise;
+use GuzzleHttp\Psr7\MultipartStream;
 use Proxy\Proxy;
 use Proxy\Adapter\Guzzle\GuzzleAdapter;
 use Proxy\Filter\RemoveEncodingFilter;
 use Zend\Diactoros\ServerRequestFactory;
+use Psr\Http\Message\RequestInterface;
 
 class MeshClient extends HttpClient implements
     Methods\UsersMethodsInterface,
@@ -119,6 +121,13 @@ class MeshClient extends HttpClient implements
         $guzzle = new HttpClient(array_merge($this->passedConfig, $config));
         $proxy = new Proxy(new GuzzleAdapter($guzzle));
 
+        // Creates multipart stream on POST requests with multipart/form-data
+        $proxy->filter(function ($request, $response, $next) {
+            $request = $this->setMultipart($request);
+            $response = $next($request, $response);
+            return $response;
+        });
+
         // Add Proxy headers
         $proxy->filter(function ($request, $response, $next) {
             $request = $request->withHeader('Via', '1.1 MeshPhpClient');
@@ -137,8 +146,44 @@ class MeshClient extends HttpClient implements
         }
 
         $response = $proxy->forward($request)->to($this->baseUri . $proxyPath);
-
         return $response;
+    }
+
+    /**
+     * Detects and creates multipart stream if content-type is related
+     *
+     * @param \Psr\Http\Message\RequestInterface $request
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    protected function setMultipart(RequestInterface $request)
+    {
+        $contentType = $request->getHeader('Content-Type');
+        $contentType = empty($contentType) ? '' : $contentType[0];
+
+        if (strpos($contentType, 'multipart/form-data') !== false && $request->getMethod() == 'POST') {
+            $elements = array();
+            foreach ($_POST as $key => $value) {
+                $tmp = array();
+                $tmp['name'] = $key;
+                $tmp['contents'] = $value;
+                array_push($elements, $tmp);
+            }
+
+            foreach ($_FILES as $key => $value) {
+                $tmp = array();
+                $tmp['name'] = $key;
+                $tmp['filename'] = $value['name'];
+                $tmp['headers']['Content-Type'] = $value['type'];
+                $tmp['headers']['Content-Length'] = $value['size'];
+                $tmp['contents'] = fopen($value['tmp_name'], 'r');
+                array_push($elements, $tmp);
+            }
+            $body = new MultipartStream($elements);
+            $request = $request->withBody($body)
+                ->withHeader('Content-Type', 'multipart/form-data; Boundary=' . $body->getBoundary());
+        }
+
+        return $request;
     }
 
     // Direct requestAsyc method
