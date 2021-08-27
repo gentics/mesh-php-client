@@ -170,13 +170,16 @@ class MeshClient extends HttpClient implements
             }
 
             foreach ($_FILES as $key => $value) {
-                $tmp = array();
-                $tmp['name'] = $key;
-                $tmp['filename'] = $value['name'];
-                $tmp['headers']['Content-Type'] = $value['type'];
-                $tmp['headers']['Content-Length'] = $value['size'];
-                $tmp['contents'] = fopen($value['tmp_name'], 'r');
-                array_push($elements, $tmp);
+                // only add file part if a file was provided in the request
+                if (!empty($value['value'])) {
+                    $tmp = array();
+                    $tmp['name'] = $key;
+                    $tmp['filename'] = $value['name'];
+                    $tmp['headers']['Content-Type'] = $value['type'];
+                    $tmp['headers']['Content-Length'] = $value['size'];
+                    $tmp['contents'] = fopen($value['tmp_name'], 'r');
+                    array_push($elements, $tmp);
+                }
             }
             $body = new MultipartStream($elements);
             $request = $request->withBody($body)
