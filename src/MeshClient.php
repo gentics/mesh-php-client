@@ -171,7 +171,7 @@ class MeshClient extends HttpClient implements
 
             foreach ($_FILES as $key => $value) {
                 // only add file part if a file was provided in the request
-                if (!empty($value['value'])) {
+                if (!empty($value['tmp_name'])) {
                     $tmp = array();
                     $tmp['name'] = $key;
                     $tmp['filename'] = $value['name'];
