@@ -162,26 +162,40 @@ class MeshClient extends HttpClient implements
 
         if (strpos($contentType, 'multipart/form-data') !== false && $request->getMethod() == 'POST') {
             $elements = array();
-            foreach ($_POST as $key => $value) {
-                $tmp = array();
-                $tmp['name'] = $key;
-                $tmp['contents'] = $value;
-                array_push($elements, $tmp);
-            }
 
-            foreach ($_FILES as $key => $value) {
-                // only add file part if a file was provided in the request
-                if (!empty($value['tmp_name'])) {
+            foreach ($_POST as $key => $value) {
+                if (!is_array($value)) {
+                    $value = [$value];
+                }
+
+                foreach ($value as $valElement) {
                     $tmp = array();
                     $tmp['name'] = $key;
-                    $tmp['filename'] = $value['name'];
-                    $tmp['headers']['Content-Type'] = $value['type'];
-                    $tmp['headers']['Content-Length'] = $value['size'];
-                    $tmp['contents'] = fopen($value['tmp_name'], 'r');
+                    $tmp['contents'] = $valElement;
                     array_push($elements, $tmp);
                 }
             }
+
+            foreach ($_FILES as $key => $value) {
+                if (!is_array($value)) {
+                    $value = [$value];
+                }
+
+                foreach ($value as $valElement) {
+                    // only add file part if a file was provided in the request
+                    if (!empty($valElement['tmp_name'])) {
+                        $tmp = array();
+                        $tmp['name'] = $key;
+                        $tmp['filename'] = $valElement['name'];
+                        $tmp['headers']['Content-Type'] = $valElement['type'];
+                        $tmp['headers']['Content-Length'] = $valElement['size'];
+                        $tmp['contents'] = fopen($valElement['tmp_name'], 'r');
+                        array_push($elements, $tmp);
+                    }
+                }
+            }
             $body = new MultipartStream($elements);
+
             $request = $request->withBody($body)
                 ->withHeader('Content-Type', 'multipart/form-data; Boundary=' . $body->getBoundary());
         }
