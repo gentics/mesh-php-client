@@ -195,7 +195,6 @@ class MeshClient extends HttpClient implements
                 }
             }
             $body = new MultipartStream($elements);
-            dd($elements);
             $request = $request->withBody($body)
                 ->withHeader('Content-Type', 'multipart/form-data; Boundary=' . $body->getBoundary());
         }
