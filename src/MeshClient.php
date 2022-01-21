@@ -177,7 +177,7 @@ class MeshClient extends HttpClient implements
             }
 
             foreach ($_FILES as $key => $value) {
-                if (!is_array($value)) {
+                if (!is_array($value) || !empty($value['tmp_name'])) {
                     $value = [$value];
                 }
 
