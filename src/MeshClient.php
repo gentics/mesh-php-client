@@ -194,9 +194,16 @@ class MeshClient extends HttpClient implements
                     }
                 }
             }
+
             $body = new MultipartStream($elements);
+
+            /**
+             * Remove any Content-Length and leverage chunked transfers for multipart-data
+             */
             $request = $request->withBody($body)
-                ->withHeader('Content-Type', 'multipart/form-data; Boundary=' . $body->getBoundary());
+                ->withoutHeader('Content-Length')
+                ->withHeader('Content-Type', 'multipart/form-data; Boundary=' . $body->getBoundary())
+                ->withHeader('Transfer-Encoding', 'chunked');
         }
 
         return $request;
