@@ -6,6 +6,7 @@ use Gentics\Mesh\Client\Rest\MeshRequest;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Promise\Promise;
+use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\MultipartStream;
 use Proxy\Proxy;
 use Proxy\Adapter\Guzzle\GuzzleAdapter;
@@ -161,7 +162,7 @@ class MeshClient extends HttpClient implements
         $contentType = empty($contentType) ? '' : $contentType[0];
 
         if (strpos($contentType, 'multipart/form-data') !== false && $request->getMethod() == 'POST') {
-            $elements = array();
+            $elements = [];
 
             foreach ($_POST as $key => $value) {
                 if (!is_array($value)) {
@@ -169,7 +170,7 @@ class MeshClient extends HttpClient implements
                 }
 
                 foreach ($value as $valElement) {
-                    $tmp = array();
+                    $tmp = [];
                     $tmp['name'] = $key;
                     $tmp['contents'] = $valElement;
                     array_push($elements, $tmp);
@@ -184,7 +185,7 @@ class MeshClient extends HttpClient implements
                 foreach ($value as $valElement) {
                     // only add file part if a file was provided in the request
                     if (!empty($valElement['tmp_name'])) {
-                        $tmp = array();
+                        $tmp = [];
                         $tmp['name'] = $key;
                         $tmp['filename'] = $valElement['name'];
                         $tmp['headers']['Content-Type'] = $valElement['type'];
@@ -210,7 +211,7 @@ class MeshClient extends HttpClient implements
     }
 
     // Direct requestAsyc method
-    public function requestAsync($method, $uri = '', array $options = [])
+    public function requestAsync(string $method, $uri = '', array $options = []): PromiseInterface
     {
         if (!isset($options['base_uri'])) {
             $options['base_uri'] = rtrim($this->baseUri, '/') . '/';
@@ -621,7 +622,7 @@ class MeshClient extends HttpClient implements
 
     public function searchProjectsRaw(string $query): MeshRequest
     {
-        return $this->buildRequest("POST", "/rawSearch/projects". $query);
+        return $this->buildRequest("POST", "/rawSearch/projects" . $query);
     }
 
     public function searchTags(string $query, array $parameters = []): MeshRequest
@@ -780,7 +781,7 @@ class MeshClient extends HttpClient implements
 
     public function healthReady(float $timeout = 10.0): MeshRequest
     {
-        return $this->buildRequest("GET", "/health/ready", null , [], false, $timeout);
+        return $this->buildRequest("GET", "/health/ready", null, [], false, $timeout);
     }
 
     // Auth Methods

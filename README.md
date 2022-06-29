@@ -130,8 +130,8 @@ $client = new MeshClient("http://localhost:8080/api/v1", $config);
 
 ## Compatibility
 
-* Gentics Mesh 0.24.x
-* PHP 7.0+
+* Gentics Mesh 1.8.x
+* PHP 8.1+
 
 # TODOs
 
