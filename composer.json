@@ -22,7 +22,7 @@
 		"php": "^8.1",
 		"ext-json": "*",
 		"guzzlehttp/guzzle": "^7.4.5",
-		"ioflair/php-proxy": "^4.0.0"
+		"ioflair/php-proxy": "^4.0.1"
 	},
 	"require-dev": {
 		"isaac/composer-git-hooks": "^2.0.0",
@@ -57,7 +57,6 @@
 		"test": [
 			"@composer validate",
 			"@lint",
-			"@phpunit",
 			"@securitycheck"
 		],
 		"fixcode": [

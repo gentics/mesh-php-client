@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3d35275b8e54824c9b8f6479d6e4071f",
+    "content-hash": "5ee5e58e9b73662cb971ee1283c45965",
     "packages": [
         {
             "name": "guzzlehttp/guzzle",
@@ -334,16 +334,16 @@
         },
         {
             "name": "ioflair/php-proxy",
-            "version": "v4.0.0",
+            "version": "v4.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ioflair/php-proxy.git",
-                "reference": "3c8aa290301be048988b69aa558d1bc9b38ab149"
+                "reference": "0b9254f30411852f6fa4459005318d69659e0aac"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ioflair/php-proxy/zipball/3c8aa290301be048988b69aa558d1bc9b38ab149",
-                "reference": "3c8aa290301be048988b69aa558d1bc9b38ab149",
+                "url": "https://api.github.com/repos/ioflair/php-proxy/zipball/0b9254f30411852f6fa4459005318d69659e0aac",
+                "reference": "0b9254f30411852f6fa4459005318d69659e0aac",
                 "shasum": ""
             },
             "require": {
@@ -352,6 +352,9 @@
                 "laminas/laminas-httphandlerrunner": "^1.1",
                 "php": "^7.3|^8.0",
                 "relay/relay": "~2.0"
+            },
+            "replace": {
+                "jenssegers/proxy": ">=0.0.0"
             },
             "require-dev": {
                 "mockery/mockery": "^1.4.2",
@@ -390,9 +393,9 @@
                 "proxy"
             ],
             "support": {
-                "source": "https://github.com/ioflair/php-proxy/tree/v4.0.0"
+                "source": "https://github.com/ioflair/php-proxy/tree/v4.0.1"
             },
-            "time": "2022-06-29T10:38:30+00:00"
+            "time": "2022-07-03T10:55:17+00:00"
         },
         {
             "name": "laminas/laminas-diactoros",
@@ -1308,12 +1311,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/annotations.git",
-                "reference": "2da982ad3c26da81b91db8d7b54abf3a5922e73c"
+                "reference": "2273d90f6d32b9fcb526c9394b214fd7abf7435b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/annotations/zipball/2da982ad3c26da81b91db8d7b54abf3a5922e73c",
-                "reference": "2da982ad3c26da81b91db8d7b54abf3a5922e73c",
+                "url": "https://api.github.com/repos/doctrine/annotations/zipball/2273d90f6d32b9fcb526c9394b214fd7abf7435b",
+                "reference": "2273d90f6d32b9fcb526c9394b214fd7abf7435b",
                 "shasum": ""
             },
             "require": {
@@ -1325,7 +1328,7 @@
             "require-dev": {
                 "doctrine/cache": "^1.11 || ^2.0",
                 "doctrine/coding-standard": "^6.0 || ^8.1",
-                "phpstan/phpstan": "^0.12.20",
+                "phpstan/phpstan": "^1.4.10 || ^1.8.0",
                 "phpunit/phpunit": "^7.5 || ^8.0 || ^9.1.5",
                 "symfony/cache": "^4.4 || ^5.2",
                 "vimeo/psalm": "^4.10"
@@ -1373,7 +1376,7 @@
                 "issues": "https://github.com/doctrine/annotations/issues",
                 "source": "https://github.com/doctrine/annotations/tree/1.14.x"
             },
-            "time": "2021-10-15T21:17:00+00:00"
+            "time": "2022-07-02T10:50:20+00:00"
         },
         {
             "name": "doctrine/instantiator",
@@ -2366,12 +2369,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "f4e0bd98e5e5fa9ca6300415d5429c313b2aed08"
+                "reference": "06a7aa6a51fe1d4d2a437d49a13093536adb6ace"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/f4e0bd98e5e5fa9ca6300415d5429c313b2aed08",
-                "reference": "f4e0bd98e5e5fa9ca6300415d5429c313b2aed08",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/06a7aa6a51fe1d4d2a437d49a13093536adb6ace",
+                "reference": "06a7aa6a51fe1d4d2a437d49a13093536adb6ace",
                 "shasum": ""
             },
             "require": {
@@ -2435,7 +2438,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-06-28T05:36:48+00:00"
+            "time": "2022-07-02T06:44:58+00:00"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -2684,12 +2687,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "d0f907312b995486fe92547fa2bace772fcf54da"
+                "reference": "59819644b61807a56a97313b396d604dd771c11f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/d0f907312b995486fe92547fa2bace772fcf54da",
-                "reference": "d0f907312b995486fe92547fa2bace772fcf54da",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/59819644b61807a56a97313b396d604dd771c11f",
+                "reference": "59819644b61807a56a97313b396d604dd771c11f",
                 "shasum": ""
             },
             "require": {
@@ -2778,7 +2781,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-06-28T05:58:45+00:00"
+            "time": "2022-07-02T06:45:28+00:00"
         },
         {
             "name": "psr/cache",
@@ -2893,12 +2896,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/event-dispatcher.git",
-                "reference": "aa4f89e91c423b516ff226c50dc83f824011c253"
+                "reference": "e275e2d67d53964a3f13e056886ecd769edee021"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/event-dispatcher/zipball/aa4f89e91c423b516ff226c50dc83f824011c253",
-                "reference": "aa4f89e91c423b516ff226c50dc83f824011c253",
+                "url": "https://api.github.com/repos/php-fig/event-dispatcher/zipball/e275e2d67d53964a3f13e056886ecd769edee021",
+                "reference": "e275e2d67d53964a3f13e056886ecd769edee021",
                 "shasum": ""
             },
             "require": {
@@ -2938,7 +2941,7 @@
             "support": {
                 "source": "https://github.com/php-fig/event-dispatcher/tree/master"
             },
-            "time": "2021-02-08T21:15:39+00:00"
+            "time": "2022-06-29T17:22:39+00:00"
         },
         {
             "name": "psr/log",
