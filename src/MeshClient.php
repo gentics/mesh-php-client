@@ -123,16 +123,16 @@ class MeshClient extends HttpClient implements
         $proxy = new Proxy(new GuzzleAdapter($guzzle));
 
         // Creates multipart stream on POST requests with multipart/form-data
-        $proxy->filter(function ($request, $response, $next) {
+        $proxy->filter(function ($request, $next) {
             $request = $this->setMultipart($request);
-            $response = $next($request, $response);
+            $response = $next($request);
             return $response;
         });
 
         // Add Proxy headers
-        $proxy->filter(function ($request, $response, $next) {
+        $proxy->filter(function ($request, $next) {
             $request = $request->withHeader('Via', '1.1 MeshPhpClient');
-            $response = $next($request, $response);
+            $response = $next($request);
             return $response;
         });
 
