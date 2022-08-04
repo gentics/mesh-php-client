@@ -1103,6 +1103,11 @@ class MeshClient extends HttpClient implements
         return $this->buildRequest("GET", "/" . $this->encodeSegment($projectName) . "/webrootfield/" . $fieldName . "/" . $path, null, $parameters, $stream);
     }
 
+    public function pluginRequest(string $projectName, string $pluginName, string $method, string $path, array $parameters = [], $stream = false)
+    {
+        return $this->buildRequest($method, "/" . $this->encodeSegment($projectName) . "/plugins/" . $this->encodeSegment($pluginName) . "/" . $path, null, $parameters, $stream);
+    }
+
 
     private function encodeSegment(string $segment)
     {

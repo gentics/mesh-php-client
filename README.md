@@ -138,6 +138,15 @@ $client = new MeshClient("http://localhost:8080/api/v1", $config);
 * Implement full upload support
 * Implement eventbus websocket support
 
+## Release
+
+**maintenance-0.10.x branch**
+Versioning: 0.10.x - PHP 7.x, Guzzle 6
+
+**master branch**
+Versioning: 0.20.x - PHP 8.1+, Guzzle 7
+
 ## License
 
 [Apache License Version 2.0](http://www.apache.org/licenses/)
+
