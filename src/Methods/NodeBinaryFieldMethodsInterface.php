@@ -6,7 +6,6 @@ use Gentics\Mesh\Client\Rest\MeshRequest;
 
 interface NodeBinaryFieldMethodsInterface
 {
-
     /**
      * Update the binary field for the node with the given nodeUuid in the given project using the provided data buffer.
      *

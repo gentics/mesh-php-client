@@ -6,7 +6,6 @@ use Gentics\Mesh\Client\Rest\MeshRequest;
 
 interface SearchMethodsInterface
 {
-
     /**
      * Search nodes.
      *

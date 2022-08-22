@@ -6,7 +6,6 @@ use Gentics\Mesh\Client\Rest\MeshRequest;
 
 interface NavRootMethodsInterface
 {
-
     /**
      * Load a navigation response for the container node that is referenced by the given path.
      *

@@ -6,7 +6,6 @@ use Gentics\Mesh\Client\Rest\MeshRequest;
 
 interface AdminPluginMethodsInterface
 {
-
     /**
      * Return the Gentics Mesh server status.
      *

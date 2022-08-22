@@ -6,7 +6,6 @@ use Gentics\Mesh\Client\Rest\MeshRequest;
 
 interface NodesMethodsInterface
 {
-
     /**
      * Find the node with the given UUID in the project with the given name. The query parameters can be utilized to set the desired language and expand field
      * settings.

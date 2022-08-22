@@ -6,7 +6,6 @@ use Gentics\Mesh\Client\Rest\MeshRequest;
 
 interface SchemaMethodsInterface
 {
-
     /**
      * Create a new schema using the given request.
      *
