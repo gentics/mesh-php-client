@@ -161,7 +161,7 @@ class MeshClient extends HttpClient implements
         $contentType = empty($contentType) ? '' : $contentType[0];
 
         if (strpos($contentType, 'multipart/form-data') !== false && $request->getMethod() == 'POST') {
-            $elements = array();
+            $elements = [];
 
             foreach ($_POST as $key => $value) {
                 if (!is_array($value)) {
@@ -169,7 +169,7 @@ class MeshClient extends HttpClient implements
                 }
 
                 foreach ($value as $valElement) {
-                    $tmp = array();
+                    $tmp = [];
                     $tmp['name'] = $key;
                     $tmp['contents'] = $valElement;
                     array_push($elements, $tmp);
@@ -184,7 +184,7 @@ class MeshClient extends HttpClient implements
                 foreach ($value as $valElement) {
                     // only add file part if a file was provided in the request
                     if (!empty($valElement['tmp_name'])) {
-                        $tmp = array();
+                        $tmp = [];
                         $tmp['name'] = $key;
                         $tmp['filename'] = $valElement['name'];
                         $tmp['headers']['Content-Type'] = $valElement['type'];
@@ -780,7 +780,7 @@ class MeshClient extends HttpClient implements
 
     public function healthReady(float $timeout = 10.0): MeshRequest
     {
-        return $this->buildRequest("GET", "/health/ready", null , [], false, $timeout);
+        return $this->buildRequest("GET", "/health/ready", null, [], false, $timeout);
     }
 
     // Auth Methods
