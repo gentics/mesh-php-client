@@ -6,7 +6,6 @@ use Gentics\Mesh\Client\Rest\MeshRequest;
 
 interface WebrootMethodsInterface
 {
-
     /**
      * Load a node via webroot path.
      *

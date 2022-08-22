@@ -6,7 +6,6 @@ use Gentics\Mesh\Client\Rest\MeshRequest;
 
 interface JobMethodsInterface
 {
-
     /**
      * Load multiple jobs.
      *

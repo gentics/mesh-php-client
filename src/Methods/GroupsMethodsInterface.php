@@ -6,7 +6,6 @@ use Gentics\Mesh\Client\Rest\MeshRequest;
 
 interface GroupsMethodsInterface
 {
-
     /**
      * Find the group with the given Uuid.
      *

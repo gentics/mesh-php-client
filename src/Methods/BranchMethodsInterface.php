@@ -6,7 +6,6 @@ use Gentics\Mesh\Client\Rest\MeshRequest;
 
 interface BranchMethodsInterface
 {
-
     /**
      * Create a branch for the given project.
      *

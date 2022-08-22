@@ -7,7 +7,6 @@ use GuzzleHttp\Promise\Promise;
 
 interface AuthMethodsInterface
 {
-
     /**
      * Login the user using the credentials that have been set using {@link MeshRestClient#setLogin(String, String)}.
      *

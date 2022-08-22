@@ -6,7 +6,6 @@ use Gentics\Mesh\Client\Rest\MeshRequest;
 
 interface TagFamiliesMethodsInterface
 {
-
     /**
      * Load the tag family using the given UUID.
      *

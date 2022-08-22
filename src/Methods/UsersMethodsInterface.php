@@ -6,7 +6,6 @@ use Gentics\Mesh\Client\Rest\MeshRequest;
 
 interface UsersMethodsInterface
 {
-
     /**
      * Load a specific user by uuid.
      *

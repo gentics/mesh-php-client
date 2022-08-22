@@ -6,7 +6,6 @@ use Gentics\Mesh\Client\Rest\MeshRequest;
 
 interface NavigationMethodsInterface
 {
-
     /**
      * Load the navigation response using the given node uuid as the root element of the navigation.
      *
