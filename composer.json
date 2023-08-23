@@ -1,76 +1,76 @@
 {
-	"name": "gentics/mesh-php-client",
-	"type": "library",
-	"description": "Gentics Mesh PHP Client Library",
-	"license": "Apache-2.0",
-	"keywords": [
-			"mesh",
-			"rest-client",
-			"sdk"
-	],
-	"autoload": {
-		"psr-4": {
-			"Gentics\\Mesh\\Client\\": "src/"
-		}
-	},
-	"autoload-dev": {
-		"psr-4": {
-			"Gentics\\Mesh\\ClientTest\\": "tests/"
-		}
-	},
-	"require": {
-		"php": "^8.1",
-		"ext-json": "*",
-		"guzzlehttp/guzzle": "^7.4.5",
-		"ioflair/php-proxy": "^4.0.1"
-	},
-	"require-dev": {
-		"isaac/composer-git-hooks": "^2.0.0",
-		"friendsofphp/php-cs-fixer": "^3.8.0",
-		"overtrue/phplint": "^5.2.2",
-		"phpunit/phpunit": "^9.5.21",
-		"enlightn/security-checker": "^1.10.0",
-		"squizlabs/php_codesniffer": "^3.7.1"
-	},
-	"config": {
-		"sort-packages": true,
-		"allow-plugins": {
-			"isaac/composer-git-hooks": true
-		}
-	},
-	"minimum-stability": "dev",
-	"prefer-stable": true,
-	"scripts": {
-		"pre-commit": [
-			"@test"
-		],
-		"lint": [
-			"phplint src/",
-			"php-cs-fixer fix --dry-run --verbose",
-			"phpcs src/"
-		],
-		"securitycheck": [
-			"security-checker security:check composer.lock"
-		],
-		"phpunit": [
-			"phpunit tests/"
-		],
-		"test": [
-			"@composer validate",
-			"@lint",
-			"@securitycheck"
-		],
-		"fixcode": [
-			"php-cs-fixer fix"
-		],
-		"build": [
-			"@composer install",
-			"mkdir -p .reports",
-			"./vendor/bin/phplint src/",
-			"./vendor/bin/php-cs-fixer fix --dry-run --format=junit > .reports/php-cs-fixer.xml || true",
-			"./vendor/bin/phpcs --warning-severity=6 --report=junit --report-file=.reports/phpcs.xml src/ || true",
-			"./vendor/bin/phpunit --log-junit=.reports/phpunit.xml src/ || true",
-			"./vendor/bin/security-checker security:check composer.lock"
-		]
-	}
+    "name": "gentics/mesh-php-client",
+    "type": "library",
+    "description": "Gentics Mesh PHP Client Library",
+    "license": "Apache-2.0",
+    "keywords": [
+        "mesh",
+        "rest-client",
+        "sdk"
+    ],
+    "autoload": {
+        "psr-4": {
+            "Gentics\\Mesh\\Client\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Gentics\\Mesh\\ClientTest\\": "tests/"
+        }
+    },
+    "require": {
+        "php": "^8.1",
+        "ext-json": "*",
+        "guzzlehttp/guzzle": "^7.4.5",
+        "ioflair/php-proxy": "^4.0.2"
+    },
+    "require-dev": {
+        "isaac/composer-git-hooks": "^2.0.0",
+        "friendsofphp/php-cs-fixer": "^3.8.0",
+        "overtrue/phplint": "^5.2.2",
+        "phpunit/phpunit": "^9.5.21",
+        "enlightn/security-checker": "^1.10.0",
+        "squizlabs/php_codesniffer": "^3.7.1"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "isaac/composer-git-hooks": true
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "scripts": {
+        "pre-commit": [
+            "@test"
+        ],
+        "lint": [
+            "phplint src/",
+            "php-cs-fixer fix --dry-run --verbose",
+            "phpcs src/"
+        ],
+        "securitycheck": [
+            "security-checker security:check composer.lock"
+        ],
+        "phpunit": [
+            "phpunit tests/"
+        ],
+        "test": [
+            "@composer validate",
+            "@lint",
+            "@securitycheck"
+        ],
+        "fixcode": [
+            "php-cs-fixer fix"
+        ],
+        "build": [
+            "@composer install",
+            "mkdir -p .reports",
+            "./vendor/bin/phplint src/",
+            "./vendor/bin/php-cs-fixer fix --dry-run --format=junit > .reports/php-cs-fixer.xml || true",
+            "./vendor/bin/phpcs --warning-severity=6 --report=junit --report-file=.reports/phpcs.xml src/ || true",
+            "./vendor/bin/phpunit --log-junit=.reports/phpunit.xml src/ || true",
+            "./vendor/bin/security-checker security:check composer.lock"
+        ]
+    }
 }
