@@ -11,7 +11,7 @@ use GuzzleHttp\Psr7\MultipartStream;
 use Proxy\Proxy;
 use Proxy\Adapter\Guzzle\GuzzleAdapter;
 use Proxy\Filter\RemoveEncodingFilter;
-use Zend\Diactoros\ServerRequestFactory;
+use Laminas\Diactoros\ServerRequestFactory;
 use Psr\Http\Message\RequestInterface;
 
 class MeshClient extends HttpClient implements
