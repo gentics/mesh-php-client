@@ -189,7 +189,7 @@ class MeshClient extends HttpClient implements
                         $tmp['name'] = $key;
                         $tmp['filename'] = $valElement['name'];
                         $tmp['headers']['Content-Type'] = $valElement['type'];
-                        $tmp['headers']['Content-Length'] = $valElement['size'];
+                        $tmp['headers']['Content-Length'] = strval($valElement['size']);
                         $tmp['contents'] = fopen($valElement['tmp_name'], 'r');
                         array_push($elements, $tmp);
                     }
