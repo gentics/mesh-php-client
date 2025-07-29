@@ -22,7 +22,8 @@
         "php": "^8.1",
         "ext-json": "*",
         "guzzlehttp/guzzle": "^7.4.5",
-        "ioflair/php-proxy": "^4.0.2"
+        "ioflair/php-proxy": "^4.0.2",
+        "symfony/process": "^6.4"
     },
     "require-dev": {
         "isaac/composer-git-hooks": "^2.0.0",
