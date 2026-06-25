@@ -234,7 +234,7 @@ class MeshClient extends HttpClient implements
             foreach (explode("\r\n", $headerSection) as $headerLine) {
                 if (strpos($headerLine, ':') !== false) {
                     [$hName, $hValue] = explode(':', $headerLine, 2);
-                    $partHeaders[trim($hName)] = trim($hValue);
+                    $partHeaders[strtolower(trim($hName))] = trim($hValue);
                 }
             }
 
