@@ -13,6 +13,7 @@ use Proxy\Adapter\Guzzle\GuzzleAdapter;
 use Proxy\Filter\RemoveEncodingFilter;
 use Laminas\Diactoros\ServerRequestFactory;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class MeshClient extends HttpClient implements
     Methods\UsersMethodsInterface,
@@ -53,6 +54,11 @@ class MeshClient extends HttpClient implements
      * Global Mesh Requests Timeout
      */
     private $meshTimeout = 0.0;
+
+    /**
+     * Optional multipart key handler
+     */
+    private $multipartKeyHandler = null;
 
     /**
      * MeshClient constructor.
@@ -110,7 +116,7 @@ class MeshClient extends HttpClient implements
      * Proxy a request to Mesh
      *
      * @param $proxyPath
-     * @param array $filters
+     * @param array|callable $filters
      * @param array $config
      * @return \Psr\Http\Message\ResponseInterface
      */
@@ -162,111 +168,61 @@ class MeshClient extends HttpClient implements
         $contentType = empty($contentType) ? '' : $contentType[0];
 
         if (strpos($contentType, 'multipart/form-data') !== false && $request->getMethod() == 'POST') {
-            if (!preg_match('/boundary=([^\s;]+)/', $contentType, $matches)) {
-                return $request;
+            $elements = [];
+
+            foreach ($_POST as $key => $value) {
+                if (!is_array($value)) {
+                    $value = [$value];
+                }
+
+                foreach ($value as $valElement) {
+                    $tmp = [];
+                    if ($this->multipartKeyHandler !== null) {
+                        $key = ($this->multipartKeyHandler)($key);
+                    }
+                    $tmp['name'] = $key;
+                    $tmp['contents'] = $valElement;
+                    array_push($elements, $tmp);
+                }
             }
 
-            $boundary = $matches[1];
+            foreach ($_FILES as $key => $value) {
+                if (!is_array($value) || !empty($value['tmp_name'])) {
+                    $value = [$value];
+                }
 
-            // Get the raw request body instead of using $_POST and $_FILES, because PHP would sanitize the
-            // names for the multipart/form-data parts and replace '.' with '_' which breaks file upload
-            // in the Mesh forms plugin (which depends on the names for file parts being JSON path strings).
-            $body = $request->getBody();
-
-            // Rewind the body just in case anything has already read the stream.
-            if ($body->isSeekable()) {
-                $body->rewind();
+                foreach ($value as $valElement) {
+                    // only add file part if a file was provided in the request
+                    if (!empty($valElement['tmp_name'])) {
+                        $tmp = [];
+                        if ($this->multipartKeyHandler !== null) {
+                            $key = ($this->multipartKeyHandler)($key);
+                        }
+                        $tmp['name'] = $key;
+                        $tmp['filename'] = $valElement['name'];
+                        $tmp['headers']['Content-Type'] = $valElement['type'];
+                        $tmp['headers']['Content-Length'] = strval($valElement['size']);
+                        $tmp['contents'] = fopen($valElement['tmp_name'], 'r');
+                        array_push($elements, $tmp);
+                    }
+                }
             }
 
-            $rawBody = (string) $body;
-            $elements = $this->parseMultipartBody($rawBody, $boundary);
+            $body = new MultipartStream($elements);
 
-            if (empty($elements)) {
-                return $request;
-            }
-
-            $multipartStream = new MultipartStream($elements);
-
-            $request = $request->withBody($multipartStream)
+            /**
+             * Remove any Content-Length and leverage chunked transfers for multipart-data
+             */
+            $request = $request->withBody($body)
                 ->withoutHeader('Content-Length')
-                ->withHeader('Content-Type', 'multipart/form-data; Boundary=' . $multipartStream->getBoundary())
+                ->withHeader('Content-Type', 'multipart/form-data; Boundary=' . $body->getBoundary())
                 ->withHeader('Transfer-Encoding', 'chunked');
         }
 
         return $request;
     }
 
-    /**
-     * Parse a raw multipart/form-data body into an array of element descriptors
-     * suitable for GuzzleHttp\Psr7\MultipartStream.
-     *
-     * Field names are taken directly from the raw Content-Disposition headers,
-     * instead of relying on $_POST and $_FILES where PHP would sanitize '.'
-     * and other characters, breaking the JSON path strings that the Mesh forms
-     * plugin expects.
-     *
-     * @param string $rawBody
-     * @param string $boundary
-     * @return array
-     */
-    private function parseMultipartBody(string $rawBody, string $boundary): array
-    {
-        $elements = [];
-
-        $delimiter = '--' . $boundary;
-        $parts = explode($delimiter, $rawBody);
-
-        // First element is preamble (empty), last element is "--" epilogue
-        array_shift($parts);
-        array_pop($parts);
-
-        foreach ($parts as $part) {
-            // Each part starts with "\r\n", then headers, then "\r\n\r\n", then body
-            if (strpos($part, "\r\n\r\n") === false) {
-                continue;
-            }
-
-            [$headerSection, $partBody] = explode("\r\n\r\n", ltrim($part, "\r\n"), 2);
-
-            $partBody = rtrim($partBody, "\r\n");
-
-            $partHeaders = [];
-            foreach (explode("\r\n", $headerSection) as $headerLine) {
-                if (strpos($headerLine, ':') !== false) {
-                    [$hName, $hValue] = explode(':', $headerLine, 2);
-                    $partHeaders[strtolower(trim($hName))] = trim($hValue);
-                }
-            }
-
-            if (!isset($partHeaders['content-disposition'])) {
-                continue;
-            }
-
-            if (!preg_match('/name="([^"]*)"/', $partHeaders['content-disposition'], $nameMatch)) {
-                continue;
-            }
-
-            $fieldName = $nameMatch[1];
-            $element = [
-                'name' => $fieldName,
-                'contents' => $partBody,
-            ];
-
-            if (preg_match('/filename="([^"]*)"/', $partHeaders['content-disposition'], $fileMatch)) {
-                $element['filename'] = $fileMatch[1];
-            }
-
-            if (isset($partHeaders['content-type'])) {
-                $element['headers']['Content-Type'] = $partHeaders['content-type'];
-            }
-
-            $elements[] = $element;
-        }
-
-        return $elements;
-    }
-
-    // Direct requestAsync method
+    // Direct requestAsyc method
     public function requestAsync(string $method, $uri = '', array $options = []): PromiseInterface
     {
         if (!isset($options['base_uri'])) {
@@ -286,6 +242,14 @@ class MeshClient extends HttpClient implements
     public function setTimeout(float $timeout)
     {
         $this->meshTimeout = $timeout;
+    }
+
+    /**
+     * Set the multipart key handler
+     * @param callable handler for the keys of parts in a multipart/form-data request
+     */
+    public function setMultipartKeyHandler(callable $multipartKeyHandler): void {
+        $this->multipartKeyHandler = $multipartKeyHandler;
     }
 
     // Node Methods
@@ -1136,7 +1100,6 @@ class MeshClient extends HttpClient implements
 
     private function encodeSegment(string $segment)
     {
-        // Encode segments RFC3986
         return rawurlencode($segment);
     }
 }
