@@ -8,6 +8,7 @@ use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Promise\Promise;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\MultipartStream;
+use GuzzleHttp\Psr7\Utils;
 use Proxy\Proxy;
 use Proxy\Adapter\Guzzle\GuzzleAdapter;
 use Proxy\Filter\RemoveEncodingFilter;
@@ -122,10 +123,17 @@ class MeshClient extends HttpClient implements
      */
     public function proxy($proxyPath, $filters = [], $config = [])
     {
-        $request = ServerRequestFactory::fromGlobals();
-
         // Use same config as the client
-        $guzzle = new HttpClient(array_merge($this->passedConfig, $config));
+        $config = array_merge($this->passedConfig, $config);
+
+        // "Expect: 100-continue" breaks the upgrade to HTTP/2 over cleartext (h2c), as the body is sent mixed into it
+        if (in_array((string) ($config['version'] ?? ''), ['2', '2.0'], true)) {
+            $config['expect'] = false;
+        }
+
+        $request = $this->prepareProxyRequest(ServerRequestFactory::fromGlobals(), $config);
+
+        $guzzle = new HttpClient($config);
         $proxy = new Proxy(new GuzzleAdapter($guzzle));
 
         // Creates multipart stream on POST requests with multipart/form-data
@@ -154,6 +162,33 @@ class MeshClient extends HttpClient implements
 
         $response = $proxy->forward($request)->to($this->baseUri . $proxyPath);
         return $response;
+    }
+
+    /**
+     * Prepares the incoming request to be forwarded to Mesh.
+     *
+     * The protocol version of the incoming request is not reused, since it may be HTTP/1.0
+     * (e.g. behind a reverse proxy), which does not support chunked transfers.
+     * Instead, the configured version (e.g. "2" for HTTP/2) or HTTP/1.1 is used.
+     *
+     * The body is buffered, so its size is known and it can be sent with a Content-Length instead of
+     * a chunked transfer (and without "Expect: 100-continue" for small bodies).
+     *
+     * @param ServerRequestInterface $request
+     * @param array $config
+     * @return ServerRequestInterface
+     */
+    protected function prepareProxyRequest(ServerRequestInterface $request, array $config)
+    {
+        $request = $request->withProtocolVersion((string) ($config['version'] ?? '1.1'));
+
+        $body = Utils::streamFor(Utils::tryFopen('php://temp', 'r+'));
+        Utils::copyToStream($request->getBody(), $body);
+        $body->rewind();
+
+        return $request->withBody($body)
+            ->withoutHeader('Transfer-Encoding')
+            ->withHeader('Content-Length', (string) $body->getSize());
     }
 
     /**
